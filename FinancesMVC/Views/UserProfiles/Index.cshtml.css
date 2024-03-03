@@ -1,0 +1,26 @@
+﻿.table {
+    font-size: 18px;
+    display: flex;
+    flex-direction: column; /* Arrange rows in a column */
+    gap: 15px;
+}
+
+#uandpp {
+    margin-left: 60%;
+    align-content: center;
+}
+
+#profile-pic {
+    width: 50vh;
+    height: 50vh;
+    border-radius: 50%;
+    overflow: hidden;
+    width: 80%;
+    height: auto;
+}
+
+.wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+}

@@ -1,0 +1,39 @@
+﻿@model FinancesDomain.Models.Transaction
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create new expenditure for @ViewBag.CategoryName</h1>
+
+<h4>Transaction</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="MoneySpent" class="control-label"></label>
+                <input asp-for="MoneySpent" class="form-control" />
+                <span asp-validation-for="MoneySpent" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ExpenditureNote" class="control-label"></label>
+                <input asp-for="ExpenditureNote" class="form-control" />
+                <span asp-validation-for="ExpenditureNote" class="text-danger"></span>
+            </div>
+            <input type="hidden" asp-for="ExpenditureCategoryId" value="@ViewBag.CategoryId" />
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

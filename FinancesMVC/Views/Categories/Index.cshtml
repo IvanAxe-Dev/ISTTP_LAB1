@@ -1,0 +1,93 @@
+﻿@model IEnumerable<FinancesDomain.Models.Category>
+
+@{
+    ViewData["Title"] = "Index";
+    var itemNum = 1;
+    var colorCodes = Model.Select(c => c.CategoryColorHexCode).ToList();
+}
+
+<h1>Your categories</h1>
+
+@if (Model.Count() != 0)
+{
+    <table class="table">
+        <thead class="table-head">
+            <tr id="head">
+                <th>
+                    @Html.DisplayNameFor(model => model.Name)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.TotalExpences)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.ExpenditureLimit)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+
+        <tbody class="table-content">
+
+            @foreach (var item in Model)
+            {
+                <tr id=@("category" + itemNum) data-id="@item.Id">
+                    <td>
+                        <b>@Html.DisplayFor(modelItem => item.Name)</b>
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TotalExpences) @(" UAN")
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ExpenditureLimit) @(" UAN")
+                    </td>
+                    <td>
+                        <a class="btn btn-primary" asp-action="NewTransaction" asp-route-id="@item.Id">Add new expenditure</a>
+                        <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.Id">Edit category</a>
+                        @* <a class="btn btn-outline-danger btn-red" asp-action="Delete" asp-route-id="@item.Id">Delete category</a> *@
+                    </td>
+                </tr>
+                itemNum++;
+            }
+        </tbody>
+    </table>
+
+}
+else
+{
+    <h1>There is no category yet :/</h1>
+}
+
+
+<p>
+
+    <a class="btn btn-primary btn-green" asp-action="Create">Add new category</a>
+</p>
+
+<script>
+    const tableRows = document.querySelectorAll('table tr');
+    tableRows.forEach(row => {
+        if (row.id != 'head') {
+            row.addEventListener('click', () => {
+                const id = row.dataset.id;
+                // Option 1: Redirect
+                window.location.href = `/Categories/Details/${id}`;
+
+                // Option 2: AJAX Call (requires more setup)
+                // $.ajax(...)
+            });
+        }
+    });
+
+    window.onload = function () {
+        var colorCodes = @Html.Raw(Json.Serialize(colorCodes));
+
+        for (let i = 0; i <= colorCodes.length - 1; i++) {
+            const tr = document.getElementById(`category${i + 1}`);
+            if (colorCodes[i] !== null) {
+                tr.style.backgroundColor = colorCodes[i];
+            }
+            console.log(tr.style.backgroundColor);
+        }
+    };
+
+</script>

@@ -1,0 +1,52 @@
+﻿@model FinancesDomain.Models.Category
+
+@{
+    ViewData["Title"] = "Create";
+}
+<script src='spectrum.js'></script>
+<link rel='stylesheet' href='spectrum.css' />
+
+<h1>Add new category</h1>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label class="control-label">New category name</label>
+                <input asp-for="Name" class="form-control" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ExpenditureLimit" class="control-label"></label>
+                <input asp-for="ExpenditureLimit" class="form-control" />
+                <span asp-validation-for="ExpenditureLimit" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="container">
+                    Should the category be controlled by a parent?
+                    <input asp-for="IsParentControl" type="checkbox" />
+                </label>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Choose color:</label>
+                <input asp-for="CategoryColorHexCode" type='color' name='color2' value='#3355cc' />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+<script>
+    $("input[asp-for='CategoryColorHexCode']").spectrum();
+</script>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

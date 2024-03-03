@@ -1,0 +1,59 @@
+﻿@model IEnumerable<FinancesDomain.Models.Transaction>
+
+@{
+    ViewData["Title"] = "Transactions";
+}
+
+<h1>Last expenditures on @ViewBag.CategoryName</h1>
+
+@if (Model.Count() != 0)
+{
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.ExpenditureNote)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.MoneySpent)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.Date)
+                </th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.ExpenditureNote)
+                    </td>
+                    <td>
+
+                        @Html.DisplayFor(modelItem => item.MoneySpent) @(" UAN")
+                    </td>
+
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Date)
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <h2>There is no recordings yet :/</h2>
+}
+
+<p>
+    <a class="btn btn-primary" asp-action="Create" asp-route-id="@ViewBag.CategoryId" asp-route-name="@ViewBag.CategoryName">Add new expenditure</a>
+</p>
