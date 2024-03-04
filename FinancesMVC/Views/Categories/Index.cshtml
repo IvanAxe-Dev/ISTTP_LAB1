@@ -35,10 +35,10 @@
                         <b>@Html.DisplayFor(modelItem => item.Name)</b>
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.TotalExpences) @(" UAN")
+                        @Html.DisplayFor(modelItem => item.TotalExpences)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.ExpenditureLimit) @(" UAN")
+                        @Html.DisplayFor(modelItem => item.ExpenditureLimit)
                     </td>
                     <td>
                         <a class="btn btn-primary" asp-action="NewTransaction" asp-route-id="@item.Id">Add new expenditure</a>

@@ -1,64 +1,48 @@
-﻿@model FinancesDomain.Models.Transaction
+﻿@using System.Globalization
+@model FinancesDomain.Models.Transaction
 
 @{
     ViewData["Title"] = "Edit";
+    string day = ViewBag.Date.ToString("dd");
+    CultureInfo culture = new CultureInfo("en-US");
+    string month = ViewBag.Date.ToString("MMMM", culture);
+    string shortTime = ViewBag.Date.ToString("HH:mm");
 }
 
-<h1>Edit</h1>
+<h1>Note "@ViewBag.Purpose" on @day of @month at @shortTime</h1>
 
-<h4>Transaction</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        <form asp-action="Edit" asp-route-categoryId="@ViewBag.CategoryId"
+              asp-route-categoryName="@ViewBag.CategoryName">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="UserId" class="control-label"></label>
-                <select asp-for="UserId" class="form-control" asp-items="ViewBag.UserId"></select>
-                <span asp-validation-for="UserId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MoneySpent" class="control-label"></label>
-                <input asp-for="MoneySpent" class="form-control" />
-                <span asp-validation-for="MoneySpent" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="BudgetOverflown" class="control-label"></label>
-                <input asp-for="BudgetOverflown" class="form-control" />
-                <span asp-validation-for="BudgetOverflown" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="MessageId" class="control-label"></label>
-                <select asp-for="MessageId" class="form-control" asp-items="ViewBag.MessageId"></select>
-                <span asp-validation-for="MessageId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CompletedAchievementId" class="control-label"></label>
-                <select asp-for="CompletedAchievementId" class="form-control" asp-items="ViewBag.CompletedAchievementId"></select>
-                <span asp-validation-for="CompletedAchievementId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ExpenditureCategoryId" class="control-label"></label>
-                <select asp-for="ExpenditureCategoryId" class="form-control" asp-items="ViewBag.ExpenditureCategoryId"></select>
-                <span asp-validation-for="ExpenditureCategoryId" class="text-danger"></span>
-            </div>
+            <input type="hidden" asp-for="UserId" />
+            <input type="hidden" asp-for="Date" />
+            <input type="hidden" asp-for="BudgetOverflown" />
+            <input type="hidden" asp-for="MessageId" />
+            <input type="hidden" asp-for="CompletedAchievementId" />
+            <input type="hidden" asp-for="ExpenditureCategoryId" />
             <div class="form-group">
                 <label asp-for="ExpenditureNote" class="control-label"></label>
                 <input asp-for="ExpenditureNote" class="form-control" />
                 <span asp-validation-for="ExpenditureNote" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
+                <label asp-for="MoneySpent" class="control-label"></label>
+                <input asp-for="MoneySpent" class="form-control" formnovalidate/>
+                <span asp-validation-for="MoneySpent" class="text-danger"></span>
             </div>
+            <input style="margin-top:5%"  id="save-btn" class="btn btn-primary" type="submit" value="Save" />
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+<a style="margin-top:1%" class="btn btn-outline-primary" class="btn btn-primary" asp-action="Index" asp-route-id="@ViewBag.CategoryId"
+   asp-route-name="@ViewBag.CategoryName">Back to expenditures</a>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
+

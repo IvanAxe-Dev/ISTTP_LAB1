@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Text.RegularExpressions;
 
 namespace FinancesDomain.Models;
 
@@ -11,9 +12,11 @@ public partial class Transaction
     public int? UserId { get; set; }
 
     [Display(Name = "Money spent")]
-    //add validation to pass decimals with , and .
+    [MoneySpentValidation]
+    [DataType(DataType.Currency)]
     public decimal MoneySpent { get; set; }
 
+    [Display(Name = "When?")]
     public DateTime? Date { get; set; }
 
     public bool? BudgetOverflown { get; set; }
@@ -34,4 +37,22 @@ public partial class Transaction
     public virtual Message? Message { get; set; }
 
     public virtual User? User { get; set; }
+}
+
+public class MoneySpentValidationAttribute : ValidationAttribute
+{
+    protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+    {
+        if (value != null)  // If there's a value
+        {
+            // Apply your existing RegularExpression validation logic here
+            var regex = new Regex(@"^[0-9]+(?:\,\d{1,3})*(?:\.[0-9]{2})?$");
+            if (!regex.IsMatch(value.ToString()))
+            {
+                return new ValidationResult("Please enter a valid money amount (decimal only).");
+            }
+        }
+
+        return ValidationResult.Success;
+    }
 }

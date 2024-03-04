@@ -3,15 +3,21 @@
 @{
     ViewData["Title"] = "Transactions";
 }
+<div style="display: flex; width:auto; gap:5%; justify-content: space-between; margin-bottom:1%;">
+    <h1><i>Last expenditures on</i> "@ViewBag.CategoryName"</h1>
+    <a class="btn btn-primary d-flex align-items-center" style="font-size: 18px;"
+       asp-action="Create" asp-route-id="@ViewBag.CategoryId" asp-route-name="@ViewBag.CategoryName">Add new expenditure</a>
+    <a class="btn btn-danger d-flex align-items-center" style="font-size: 18px;"
+       asp-action="Create" asp-route-id="@ViewBag.CategoryId" asp-route-name="@ViewBag.CategoryName">Delete category</a>
+</div>
 
-<h1>Last expenditures on @ViewBag.CategoryName</h1>
 
 @if (Model.Count() != 0)
 {
 
     <table class="table">
-        <thead>
-            <tr>
+        <thead class="table-head">
+            <tr id="head">
                 <th>
                     @Html.DisplayNameFor(model => model.ExpenditureNote)
                 </th>
@@ -21,28 +27,33 @@
                 <th>
                     @Html.DisplayNameFor(model => model.Date)
                 </th>
-                <th></th>
+                <th>
+                </th>
             </tr>
         </thead>
-        <tbody>
-            @foreach (var item in Model)
+        <tbody class="table-content">
+            @foreach (var item in Model.Reverse())
             {
-                <tr>
+                <tr data-id="@item.Id">
                     <td>
                         @Html.DisplayFor(modelItem => item.ExpenditureNote)
                     </td>
                     <td>
 
-                        @Html.DisplayFor(modelItem => item.MoneySpent) @(" UAN")
+                        @Html.DisplayFor(modelItem => item.MoneySpent)
                     </td>
 
                     <td>
                         @Html.DisplayFor(modelItem => item.Date)
                     </td>
                     <td>
-                        <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                        <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                        <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                        <form asp-action="Delete" asp-route-id="@item.Id" asp-route-categoryId="@ViewBag.CategoryId"
+                              asp-route-categoryName="@ViewBag.CategoryName" method="post">
+                            <button type="submit" class="btn btn-outline-danger"
+                                    onclick="return openDeleteConfirmation(this.closest('form'));">
+                                Delete
+                            </button>
+                        </form>
                     </td>
                 </tr>
             }
@@ -54,6 +65,28 @@ else
     <h2>There is no recordings yet :/</h2>
 }
 
-<p>
-    <a class="btn btn-primary" asp-action="Create" asp-route-id="@ViewBag.CategoryId" asp-route-name="@ViewBag.CategoryName">Add new expenditure</a>
-</p>
+<script>
+    const tableRows = document.querySelectorAll('table tr');
+    tableRows.forEach(row => {
+        if (row.id != 'head') {
+            row.addEventListener('click', () => {
+                const id = row.dataset.id;
+                // Option 1: Redirect
+                window.location.href = `/Transactions/Edit/${id}?categoryId=${@ViewBag.CategoryId}`;
+
+                // Option 2: AJAX Call (requires more setup)
+                // $.ajax(...)
+            });
+        }
+    });
+
+    function openDeleteConfirmation(form) {
+        if (confirm("Are you sure you want to delete this recording?")) {
+            form.submit(); // Submit the form if confirmed
+            return true;
+        } else {
+            return false; // Prevent submission if not confirmed
+        }
+    }
+
+</script>

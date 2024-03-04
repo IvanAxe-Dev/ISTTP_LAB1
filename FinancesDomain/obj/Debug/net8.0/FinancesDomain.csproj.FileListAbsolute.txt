@@ -20,3 +20,4 @@ C:\Users\ivane\VS projects\Finances\FinancesDomain\obj\Debug\net8.0\FinancesDoma
 C:\Users\ivane\VS projects\Finances\FinancesDomain\obj\Debug\net8.0\refint\FinancesDomain.dll
 C:\Users\ivane\VS projects\Finances\FinancesDomain\obj\Debug\net8.0\FinancesDomain.pdb
 C:\Users\ivane\VS projects\Finances\FinancesDomain\obj\Debug\net8.0\ref\FinancesDomain.dll
+C:\Users\ivane\VS projects\Finances\FinancesDomain\obj\Debug\net8.0\FinancesDomain.sourcelink.json

@@ -24,7 +24,7 @@ namespace FinancesMVC.Controllers
         // GET: Transactions
         public async Task<IActionResult> Index(int? id, string? name)
         {
-            if(id == null) return RedirectToAction("Index", "Categories");
+            if (id == null) return RedirectToAction("Index", "Categories");
 
             ViewBag.CategoryId = id;
             ViewBag.CategoryName = name;
@@ -77,14 +77,24 @@ namespace FinancesMVC.Controllers
             transaction.UserId = _context.Users.ToList()[0].Id;
             transaction.Date = DateTime.Now;
             var category = await _context.Categories.FindAsync(transaction.ExpenditureCategoryId);
-            if(category== null) return NotFound();
+            if (category == null) return NotFound();
             category.TotalExpences += transaction.MoneySpent;
+            //check if budget is overflown
+            if (category.ExpenditureLimit != null)
+            {
+                if ((double)category.TotalExpences > category.ExpenditureLimit)
+                {
+                    category.CategoryColorHexCode = "#d73d23";
+                    transaction.BudgetOverflown = true;
+                }
+            }
+            
             _context.Update(category);
             if (ModelState.IsValid)
             {
                 _context.Add(transaction);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index), new {transaction.ExpenditureCategoryId, });
+                return RedirectToAction(nameof(Index), new { category.Id, category.Name});
             }
             ViewData["CompletedAchievementId"] = new SelectList(_context.Achievements, "Id", "Id", transaction.CompletedAchievementId);
             ViewData["ExpenditureCategoryId"] = new SelectList(_context.Categories, "Id", "Name", transaction.ExpenditureCategoryId);
@@ -94,8 +104,10 @@ namespace FinancesMVC.Controllers
         }
 
         // GET: Transactions/Edit/5
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit(int? id, int? categoryId)
         {
+            var category = _context.Categories.Find(categoryId);
+
             if (id == null)
             {
                 return NotFound();
@@ -106,6 +118,10 @@ namespace FinancesMVC.Controllers
             {
                 return NotFound();
             }
+            ViewBag.Purpose = transaction.ExpenditureNote;
+            ViewBag.Date = transaction.Date;
+            ViewBag.CategoryId = categoryId;
+            ViewBag.CategoryName = category.Name;
             ViewData["CompletedAchievementId"] = new SelectList(_context.Achievements, "Id", "Id", transaction.CompletedAchievementId);
             ViewData["ExpenditureCategoryId"] = new SelectList(_context.Categories, "Id", "Name", transaction.ExpenditureCategoryId);
             ViewData["MessageId"] = new SelectList(_context.Messages, "Id", "Id", transaction.MessageId);
@@ -118,14 +134,14 @@ namespace FinancesMVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,MoneySpent,BudgetOverflown,MessageId,CompletedAchievementId,ExpenditureCategoryId,ExpenditureNote")] Transaction transaction)
+        public async Task<IActionResult> Edit(int id, int? categoryId, string? categoryName, [Bind("Id,UserId,MoneySpent,BudgetOverflown,Date,MessageId,CompletedAchievementId,ExpenditureCategoryId,ExpenditureNote")] Transaction transaction)
         {
             if (id != transaction.Id)
             {
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (TryValidateModel(ModelState, nameof(ModelState)))
             {
                 try
                 {
@@ -143,7 +159,7 @@ namespace FinancesMVC.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction("Index", "Transactions", new { id = categoryId, name = categoryName});
             }
             ViewData["CompletedAchievementId"] = new SelectList(_context.Achievements, "Id", "Id", transaction.CompletedAchievementId);
             ViewData["ExpenditureCategoryId"] = new SelectList(_context.Categories, "Id", "Name", transaction.ExpenditureCategoryId);
@@ -177,7 +193,7 @@ namespace FinancesMVC.Controllers
         // POST: Transactions/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> DeleteConfirmed(int id, int? categoryId, string? categoryName)
         {
             var transaction = await _context.Transactions.FindAsync(id);
             if (transaction != null)
@@ -186,7 +202,7 @@ namespace FinancesMVC.Controllers
             }
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction("Index", "Transactions", new { id = categoryId, name = categoryName });
         }
 
         private bool TransactionExists(int id)

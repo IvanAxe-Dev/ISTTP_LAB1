@@ -10,24 +10,23 @@ using FinancesMVC;
 
 namespace FinancesMVC.Controllers
 {
-
-    public class CategoriesController : Controller
+    public class StatsController : Controller
     {
         private readonly Db1Context _context;
 
-        public CategoriesController(Db1Context context)
+        public StatsController(Db1Context context)
         {
             _context = context;
         }
 
-        // GET: Categories
+        // GET: Stats
         public async Task<IActionResult> Index()
         {
-            var db1Context = _context.Categories.Include(c => c.User);
+            var db1Context = _context.Stats.Include(s => s.ChosenCategory).Include(s => s.User);
             return View(await db1Context.ToListAsync());
         }
 
-        // GET: Transactions/Index
+        // GET: Stats/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -35,63 +34,45 @@ namespace FinancesMVC.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories
-                .Include(c => c.User)
+            var stat = await _context.Stats
+                .Include(s => s.ChosenCategory)
+                .Include(s => s.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
+            if (stat == null)
             {
                 return NotFound();
             }
 
-            return RedirectToAction("Index","Transactions", new { id = category.Id, name= category.Name});
+            return View(stat);
         }
 
-        // GET: Transactions/Create
-        public async Task<IActionResult> NewTransaction(int? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var category = await _context.Categories
-                .Include(c => c.User)
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
-            {
-                return NotFound();
-            }
-
-            return RedirectToAction("Create", "Transactions", new { id = category.Id, name = category.Name });
-        }
-
-        // GET: Categories/Create
+        // GET: Stats/Create
         public IActionResult Create()
         {
+            ViewData["ChosenCategoryId"] = new SelectList(_context.Categories, "Id", "Name");
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
             return View();
         }
 
-        // POST: Categories/Create
+        // POST: Stats/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,UserId,TotalExpences,CategoryColorHexCode,ExpenditureLimit,IsParentControl")] Category category)
+        public async Task<IActionResult> Create([Bind("Id,UserId,ChosenCategoryId,StartTime,EndTime,CalculatedExpances")] Stat stat)
         {
-            category.Id = _context.Categories.ToList().Last().Id + 1;
-            category.UserId = _context.Users.ToList()[0].Id;
-            Console.WriteLine(category.CategoryColorHexCode);
             if (ModelState.IsValid)
             {
-                _context.Add(category);
+                _context.Add(stat);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-
-            return View(category);
+            ViewData["ChosenCategoryId"] = new SelectList(_context.Categories, "Id", "Name", stat.ChosenCategoryId);
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", stat.UserId);
+            return View(stat);
         }
 
-        // GET: Categories/Edit/5
+        // GET: Stats/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -99,24 +80,24 @@ namespace FinancesMVC.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories.FindAsync(id);
-            if (category == null)
+            var stat = await _context.Stats.FindAsync(id);
+            if (stat == null)
             {
                 return NotFound();
             }
-            ViewBag.Name = category.Name;
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", category.UserId);
-            return View(category);
+            ViewData["ChosenCategoryId"] = new SelectList(_context.Categories, "Id", "Name", stat.ChosenCategoryId);
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", stat.UserId);
+            return View(stat);
         }
 
-        // POST: Categories/Edit/5
+        // POST: Stats/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,UserId,TotalExpences,ChosenGoalId,ExpenditureLimit,IsParentControl")] Category category)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,ChosenCategoryId,StartTime,EndTime,CalculatedExpances")] Stat stat)
         {
-            if (id != category.Id)
+            if (id != stat.Id)
             {
                 return NotFound();
             }
@@ -125,12 +106,12 @@ namespace FinancesMVC.Controllers
             {
                 try
                 {
-                    _context.Update(category);
+                    _context.Update(stat);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CategoryExists(category.Id))
+                    if (!StatExists(stat.Id))
                     {
                         return NotFound();
                     }
@@ -141,11 +122,12 @@ namespace FinancesMVC.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", category.UserId);
-            return View(category);
+            ViewData["ChosenCategoryId"] = new SelectList(_context.Categories, "Id", "Name", stat.ChosenCategoryId);
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", stat.UserId);
+            return View(stat);
         }
 
-        // GET: Categories/Delete/5
+        // GET: Stats/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -153,35 +135,36 @@ namespace FinancesMVC.Controllers
                 return NotFound();
             }
 
-            var category = await _context.Categories
-                .Include(c => c.User)
+            var stat = await _context.Stats
+                .Include(s => s.ChosenCategory)
+                .Include(s => s.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (category == null)
+            if (stat == null)
             {
                 return NotFound();
             }
 
-            return View(category);
+            return View(stat);
         }
 
-        // POST: Categories/Delete/5
+        // POST: Stats/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
-            if (category != null)
+            var stat = await _context.Stats.FindAsync(id);
+            if (stat != null)
             {
-                _context.Categories.Remove(category);
+                _context.Stats.Remove(stat);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CategoryExists(int id)
+        private bool StatExists(int id)
         {
-            return _context.Categories.Any(e => e.Id == id);
+            return _context.Stats.Any(e => e.Id == id);
         }
     }
 }

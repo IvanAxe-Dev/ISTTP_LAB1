@@ -1,0 +1,14 @@
+﻿#save-btn{
+    margin-top:5%;
+}
+
+.action-btns {
+    height: 10%;
+    display: flex;
+    gap: 5%;
+    margin-top: 5%;
+}
+
+.btn.btn-primary {
+    width: 25% !important;
+}

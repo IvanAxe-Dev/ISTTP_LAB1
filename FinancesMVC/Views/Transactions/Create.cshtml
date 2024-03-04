@@ -6,7 +6,6 @@
 
 <h1>Create new expenditure for @ViewBag.CategoryName</h1>
 
-<h4>Transaction</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -24,14 +23,14 @@
             </div>
             <input type="hidden" asp-for="ExpenditureCategoryId" value="@ViewBag.CategoryId" />
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input style="margin-top:5%;" type="submit" value="Create" class="btn btn-primary" />
             </div>
         </form>
     </div>
 </div>
 
 <div>
-    <a asp-action="Index">Back to List</a>
+    <a style="margin-top:1%;" class="btn btn-outline-primary" asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

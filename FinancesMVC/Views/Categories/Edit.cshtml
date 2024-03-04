@@ -4,49 +4,36 @@
     ViewData["Title"] = "Edit";
 }
 
-<h1>Edit</h1>
-
-<h4>Category</h4>
+<h1>Edit "@ViewBag.Name"</h1>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
+            <input type="hidden" asp-for="UserId" />
+            <input type="hidden" asp-for="TotalExpences" />
+            <input type="hidden" asp-for="CategoryColorHexCode" />
             <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
+                <label>Category name</label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="UserId" class="control-label"></label>
-                <select asp-for="UserId" class="form-control" asp-items="ViewBag.UserId"></select>
-                <span asp-validation-for="UserId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="TotalExpences" class="control-label"></label>
-                <input asp-for="TotalExpences" class="form-control" />
-                <span asp-validation-for="TotalExpences" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="ExpenditureLimit" class="control-label"></label>
                 <input asp-for="ExpenditureLimit" class="form-control" />
                 <span asp-validation-for="ExpenditureLimit" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label asp-for="IsParentControl" class="control-label"></label>
-                <input asp-for="IsParentControl" class="form-control" />
-                <span asp-validation-for="IsParentControl" class="text-danger"></span>
-            </div>
-            <div class="form-group">
+            <label class="container">
+                Should the category be controlled by a parent?
+                <input asp-for="IsParentControl" type="checkbox" />
+            </label>
+            <div class="action-btns">
                 <input type="submit" value="Save" class="btn btn-primary" />
+                <a class="btn btn-primary" asp-action="Index">Back</a>
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {

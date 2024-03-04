@@ -1,2 +1,27 @@
-﻿body {
+﻿.table-content tr:hover:not(#head) {
+    background-color: #f1f1f1;
+    cursor: pointer;
+    transform: scale(1.05);
+}
+
+.table {
+    table-layout: fixed;
+    width: 100%; /* optional, set the table width */
+    align-content: center;
+}
+
+    .table th,
+    .table td{
+        width: calc(100% / 4); /* adjust the divisor as needed */
+        text-align: center; /* optional, center the content */
+    }
+
+.table-content td:first-child { /* Targets the first td in each row */
+    width: auto; /* Or set a specific width */
+    text-align: left; /* Or use another alignment */
+}   
+
+.table-head th:first-child { /* Targets the first td in each row */
+    width: auto; /* Or set a specific width */
+    text-align: left; /* Or use another alignment */
 }

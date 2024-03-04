@@ -17,12 +17,14 @@ public partial class Category
 
     [Display(Name = "Money spent")]
     [Required(ErrorMessage = "This field should be filled.")]
+    [DataType(DataType.Currency)]
     public decimal TotalExpences { get; set; } = 0;
 
     public string? CategoryColorHexCode { get; set; }
 
     [Display(Name = "Expenditure limit")]
     [Required(ErrorMessage = "This field should be filled.")]
+    [DataType(DataType.Currency)]
     public double? ExpenditureLimit { get; set; }
 
     [Display(Name = "Parental control")]
