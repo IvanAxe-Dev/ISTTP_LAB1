@@ -24,7 +24,7 @@ namespace FinancesMVC.Controllers
         // GET: Transactions
         public async Task<IActionResult> Index(int? id, string? name)
         {
-            if (id == null) return RedirectToAction("Index", "Categories");
+            if (id == null || name == null) return RedirectToAction("Index", "Categories");
 
             ViewBag.CategoryId = id;
             ViewBag.CategoryName = name;
@@ -55,7 +55,7 @@ namespace FinancesMVC.Controllers
         }
 
         // GET: Transactions/Create
-        public IActionResult Create(int? id, string? name)
+        public IActionResult Create(int? id, string? name, bool isShared)
         {
             ViewBag.CategoryId = id;
             ViewBag.CategoryName = name;
@@ -88,13 +88,13 @@ namespace FinancesMVC.Controllers
                     transaction.BudgetOverflown = true;
                 }
             }
-            
+
             _context.Update(category);
             if (ModelState.IsValid)
             {
                 _context.Add(transaction);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index), new { category.Id, category.Name});
+                return RedirectToAction(nameof(Index), new { category.Id, category.Name });
             }
             ViewData["CompletedAchievementId"] = new SelectList(_context.Achievements, "Id", "Id", transaction.CompletedAchievementId);
             ViewData["ExpenditureCategoryId"] = new SelectList(_context.Categories, "Id", "Name", transaction.ExpenditureCategoryId);
@@ -136,12 +136,17 @@ namespace FinancesMVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, int? categoryId, string? categoryName, [Bind("Id,UserId,MoneySpent,BudgetOverflown,Date,MessageId,CompletedAchievementId,ExpenditureCategoryId,ExpenditureNote")] Transaction transaction)
         {
+            var category = _context.Categories.Find(categoryId);
+
             if (id != transaction.Id)
             {
                 return NotFound();
             }
 
-            if (TryValidateModel(ModelState, nameof(ModelState)))
+            ModelState.Clear();
+            TryValidateModel(transaction);
+
+            if (ModelState.IsValid)
             {
                 try
                 {
@@ -159,13 +164,23 @@ namespace FinancesMVC.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction("Index", "Transactions", new { id = categoryId, name = categoryName});
+                return RedirectToAction("Index", "Transactions", new { id = categoryId, name = categoryName });
             }
+            ViewBag.Purpose = transaction.ExpenditureNote;
+            ViewBag.Date = transaction.Date;
+            ViewBag.CategoryId = categoryId;
+            ViewBag.CategoryName = category.Name;
             ViewData["CompletedAchievementId"] = new SelectList(_context.Achievements, "Id", "Id", transaction.CompletedAchievementId);
             ViewData["ExpenditureCategoryId"] = new SelectList(_context.Categories, "Id", "Name", transaction.ExpenditureCategoryId);
             ViewData["MessageId"] = new SelectList(_context.Messages, "Id", "Id", transaction.MessageId);
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", transaction.UserId);
             return View(transaction);
+        }
+
+        public async Task<IActionResult> DeleteCategory(int? id)
+        {
+            TempData["id"] = id;
+            return RedirectToAction("Delete", "Categories", new { id });
         }
 
         // GET: Transactions/Delete/5
@@ -199,6 +214,13 @@ namespace FinancesMVC.Controllers
             if (transaction != null)
             {
                 _context.Transactions.Remove(transaction);
+            }
+
+            var category = await _context.Categories.FindAsync(categoryId);
+            if (category != null)
+            {
+                category.TotalExpences -= transaction.MoneySpent;
+                _context.Categories.Update(category);
             }
 
             await _context.SaveChangesAsync();

@@ -7,10 +7,17 @@
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/FinancesMVC.styles.css" asp-append-version="true" />
+    <style>
+        body {
+            background-image: url('@Url.Content("~/lib/backimage.jpg")') !important;
+            background-size: cover;
+        }
+    </style>
 </head>
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+        <nav style="background-color: rgba(255, 255, 255, 0.05) !important; border-bottom: none !important;"
+        class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Categories" asp-action="Index">Finances</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -19,14 +26,14 @@
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
+                        <li style="margin-left:1%;" class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="SharedBudgets" asp-action="Index">Shared Budgets</a>
                         </li>
-                        <li class="nav-item">
+                        <li style="margin-left:1%;" class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Stats" asp-action="Index">Stats</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" id="profile" asp-area="" asp-controller="UserProfiles" asp-action="Index">Profile</a>
+                            <b><a class="nav-link text-dark" id="profile" asp-area="" asp-controller="UserProfiles" asp-action="Index">Profile</a></b>
                         </li>
 
                     </ul>
@@ -40,7 +47,8 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
+    <footer style="background-color: rgba(255, 255, 255, 0.5) !important; border: none !important;" 
+    class="border-top footer text-muted">
         <div class="container">
             &copy; 2024 - Finances - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
@@ -51,3 +59,16 @@
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
+
+
+<script>
+    $.validator.methods.number = function (value, element) {
+
+        if (!isNaN(parseFloat(strValue))) {
+            return true;
+        }
+
+        return false;
+
+    }
+</script>

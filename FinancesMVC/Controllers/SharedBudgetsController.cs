@@ -27,144 +27,157 @@ namespace FinancesMVC.Controllers
         }
 
         // GET: SharedBudgets/Details/5
-        //public async Task<IActionResult> Details(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-        //    var sharedBudget = await _context.SharedBudgets
-        //        .Include(s => s.AddedUser)
-        //        .Include(s => s.OwnerUser)
-        //        .FirstOrDefaultAsync(m => m.Id == id);
-        //    if (sharedBudget == null)
-        //    {
-        //        return NotFound();
-        //    }
+            var sharedBudget = await _context.SharedBudgets
+                .Include(s => s.AddedUser)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (sharedBudget == null)
+            {
+                return NotFound();
+            }
 
-        //    return View(sharedBudget);
-        //}
+            return View(sharedBudget);
+        }
 
-        //// GET: SharedBudgets/Create
-        //public IActionResult Create()
-        //{
-        //    ViewData["AddedUserId"] = new SelectList(_context.Categories, "Id", "Name");
-        //    ViewData["OwnerUserId"] = new SelectList(_context.Users, "Id", "Id");
-        //    return View();
-        //}
+        // GET: SharedBudgets/Create
+        public IActionResult Create()
+        {
+            ViewData["AddedUserId"] = new SelectList(_context.Categories, "Id", "Name");
+            return View();
+        }
 
-        //// POST: SharedBudgets/Create
-        //// To protect from overposting attacks, enable the specific properties you want to bind to.
-        //// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Create([Bind("Id,OwnerUserId,AddedUserId,CommonCategoryId")] SharedBudget sharedBudget)
-        //{
-        //    if (ModelState.IsValid)
-        //    {
-        //        _context.Add(sharedBudget);
-        //        await _context.SaveChangesAsync();
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    ViewData["AddedUserId"] = new SelectList(_context.Categories, "Id", "Name", sharedBudget.AddedUserId);
-        //    ViewData["OwnerUserId"] = new SelectList(_context.Users, "Id", "Id", sharedBudget.OwnerUserId);
-        //    return View(sharedBudget);
-        //}
+        // GET: Transactions/Create
+        public async Task<IActionResult> NewTransaction(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-        //// GET: SharedBudgets/Edit/5
-        //public async Task<IActionResult> Edit(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
+            var category = await _context.Categories
+                .Include(c => c.User)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (category == null)
+            {
+                return NotFound();
+            }
 
-        //    var sharedBudget = await _context.SharedBudgets.FindAsync(id);
-        //    if (sharedBudget == null)
-        //    {
-        //        return NotFound();
-        //    }
-        //    ViewData["AddedUserId"] = new SelectList(_context.Categories, "Id", "Name", sharedBudget.AddedUserId);
-        //    ViewData["OwnerUserId"] = new SelectList(_context.Users, "Id", "Id", sharedBudget.OwnerUserId);
-        //    return View(sharedBudget);
-        //}
+            return RedirectToAction("Create", "Transactions", new { id = category.Id, name = category.Name });
+        }
 
-        //// POST: SharedBudgets/Edit/5
-        //// To protect from overposting attacks, enable the specific properties you want to bind to.
-        //// For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        //[HttpPost]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> Edit(int id, [Bind("Id,OwnerUserId,AddedUserId,CommonCategoryId")] SharedBudget sharedBudget)
-        //{
-        //    if (id != sharedBudget.Id)
-        //    {
-        //        return NotFound();
-        //    }
+        // POST: SharedBudgets/Create
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create([Bind("Id,AddedUserId,CommonCategoryId")] SharedBudget sharedBudget)
+        {
+            if (ModelState.IsValid)
+            {
+                _context.Add(sharedBudget);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["AddedUserId"] = new SelectList(_context.Categories, "Id", "Name", sharedBudget.AddedUserId);
+            return View(sharedBudget);
+        }
 
-        //    if (ModelState.IsValid)
-        //    {
-        //        try
-        //        {
-        //            _context.Update(sharedBudget);
-        //            await _context.SaveChangesAsync();
-        //        }
-        //        catch (DbUpdateConcurrencyException)
-        //        {
-        //            if (!SharedBudgetExists(sharedBudget.Id))
-        //            {
-        //                return NotFound();
-        //            }
-        //            else
-        //            {
-        //                throw;
-        //            }
-        //        }
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    ViewData["AddedUserId"] = new SelectList(_context.Categories, "Id", "Name", sharedBudget.AddedUserId);
-        //    ViewData["OwnerUserId"] = new SelectList(_context.Users, "Id", "Id", sharedBudget.OwnerUserId);
-        //    return View(sharedBudget);
-        //}
+        // GET: SharedBudgets/Edit/5
+        public async Task<IActionResult> Edit(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-        //// GET: SharedBudgets/Delete/5
-        //public async Task<IActionResult> Delete(int? id)
-        //{
-        //    if (id == null)
-        //    {
-        //        return NotFound();
-        //    }
+            var sharedBudget = await _context.SharedBudgets.FindAsync(id);
+            if (sharedBudget == null)
+            {
+                return NotFound();
+            }
+            ViewData["AddedUserId"] = new SelectList(_context.Categories, "Id", "Name", sharedBudget.AddedUserId);
+            return View(sharedBudget);
+        }
 
-        //    var sharedBudget = await _context.SharedBudgets
-        //        .Include(s => s.AddedUser)
-        //        .Include(s => s.OwnerUser)
-        //        .FirstOrDefaultAsync(m => m.Id == id);
-        //    if (sharedBudget == null)
-        //    {
-        //        return NotFound();
-        //    }
+        // POST: SharedBudgets/Edit/5
+        // To protect from overposting attacks, enable the specific properties you want to bind to.
+        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(int id, [Bind("Id,AddedUserId,CommonCategoryId")] SharedBudget sharedBudget)
+        {
+            if (id != sharedBudget.Id)
+            {
+                return NotFound();
+            }
 
-        //    return View(sharedBudget);
-        //}
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    _context.Update(sharedBudget);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    if (!SharedBudgetExists(sharedBudget.Id))
+                    {
+                        return NotFound();
+                    }
+                    else
+                    {
+                        throw;
+                    }
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            ViewData["AddedUserId"] = new SelectList(_context.Categories, "Id", "Name", sharedBudget.AddedUserId);
+            return View(sharedBudget);
+        }
 
-        //// POST: SharedBudgets/Delete/5
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(int id)
-        //{
-        //    var sharedBudget = await _context.SharedBudgets.FindAsync(id);
-        //    if (sharedBudget != null)
-        //    {
-        //        _context.SharedBudgets.Remove(sharedBudget);
-        //    }
+        // GET: SharedBudgets/Delete/5
+        public async Task<IActionResult> Delete(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
 
-        //    await _context.SaveChangesAsync();
-        //    return RedirectToAction(nameof(Index));
-        //}
+            var sharedBudget = await _context.SharedBudgets
+                .Include(s => s.AddedUser)
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (sharedBudget == null)
+            {
+                return NotFound();
+            }
 
-        //private bool SharedBudgetExists(int id)
-        //{
-        //    return _context.SharedBudgets.Any(e => e.Id == id);
-        //}
+            return View(sharedBudget);
+        }
+
+        // POST: SharedBudgets/Delete/5
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
+        {
+            var sharedBudget = await _context.SharedBudgets.FindAsync(id);
+            if (sharedBudget != null)
+            {
+                _context.SharedBudgets.Remove(sharedBudget);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+
+        private bool SharedBudgetExists(int id)
+        {
+            return _context.SharedBudgets.Any(e => e.Id == id);
+        }
     }
 }

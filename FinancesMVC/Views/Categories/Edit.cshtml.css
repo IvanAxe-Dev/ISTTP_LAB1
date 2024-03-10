@@ -1,6 +1,8 @@
-﻿.action-btns {
-    height: 10%;
-    display: flex;
-    gap: 5%;
-    margin-top: 5%;
+﻿.form-group{
+    margin-bottom:5%;
+    width:100%;
+}
+
+.text-danger {
+    background-color: orange !important;
 }

@@ -47,9 +47,9 @@ public class MoneySpentValidationAttribute : ValidationAttribute
         {
             // Apply your existing RegularExpression validation logic here
             var regex = new Regex(@"^[0-9]+(?:\,\d{1,3})*(?:\.[0-9]{2})?$");
-            if (!regex.IsMatch(value.ToString()))
-            {
-                return new ValidationResult("Please enter a valid money amount (decimal only).");
+            if (!regex.IsMatch(value.ToString()) || double.Parse(value.ToString()) <= 0)
+            {   
+                return new ValidationResult("Please enter a valid value (non-zero decimal only).");
             }
         }
 

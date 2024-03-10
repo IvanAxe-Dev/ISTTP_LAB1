@@ -1,5 +1,5 @@
-﻿@using System.Globalization
-@model FinancesDomain.Models.Transaction
+﻿@using System.Globalization 
+@model FinancesDomain.Models.Transaction;
 
 @{
     ViewData["Title"] = "Edit";
@@ -40,9 +40,8 @@
 </div>
 
 <a style="margin-top:1%" class="btn btn-outline-primary" class="btn btn-primary" asp-action="Index" asp-route-id="@ViewBag.CategoryId"
-   asp-route-name="@ViewBag.CategoryName">Back to expenditures</a>
+   asp-route-name="@ViewBag.CategoryName">Back to List</a>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
-

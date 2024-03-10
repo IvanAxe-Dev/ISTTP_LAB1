@@ -25,3 +25,12 @@
     width: auto; /* Or set a specific width */
     text-align: left; /* Or use another alignment */
 }
+
+table {
+    border-collapse: separate;
+    border-spacing: 0 10px; /* No vertical spacing, 10px horizontal spacing */
+}
+
+td, th {
+    padding: 11px;
+}

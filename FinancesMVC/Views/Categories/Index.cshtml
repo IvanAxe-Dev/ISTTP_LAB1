@@ -6,7 +6,12 @@
     var colorCodes = Model.Select(c => c.CategoryColorHexCode).ToList();
 }
 
-<h1>Your categories</h1>
+
+<script src='spectrum.js'></script>
+<link rel='stylesheet' href='spectrum.css' />
+
+
+<h1 style="text-align:center; font-size:50px; margin-bottom:1%;">Your categories</h1>
 
 @if (Model.Count() != 0)
 {
@@ -38,7 +43,7 @@
                         @Html.DisplayFor(modelItem => item.TotalExpences)
                     </td>
                     <td>
-                        @Html.DisplayFor(modelItem => item.ExpenditureLimit)
+                        <b>@Html.DisplayFor(modelItem => item.ExpenditureLimit)</b>
                     </td>
                     <td>
                         <a class="btn btn-primary" asp-action="NewTransaction" asp-route-id="@item.Id">Add new expenditure</a>
@@ -54,7 +59,7 @@
 }
 else
 {
-    <h1>There is no category yet :/</h1>
+    <h1>There is no categories yet :/</h1>
 }
 
 
@@ -87,6 +92,34 @@ else
                 tr.style.backgroundColor = colorCodes[i];
             }
             console.log(tr.style.backgroundColor);
+        }
+
+        const tableRows = document.querySelectorAll('table tr');
+        const tableCells = document.querySelectorAll('table td');
+
+        // Apply opacity to table rows' background color
+        tableRows.forEach(row => {
+            if (row.id !== 'head') { // Exclude the table header row
+                row.style.backgroundColor = modifyColorWithOpacity(row.style.backgroundColor, 0.7);
+            }
+        });
+
+        // Apply opacity to table cells' background color
+        tableCells.forEach(cell => {
+            cell.style.backgroundColor = modifyColorWithOpacity(cell.style.backgroundColor, 0.7);
+        });
+
+        // ... (Your existing code for color codes and click events) ...
+
+        // Helper function to modify color with opacity
+        function modifyColorWithOpacity(color, opacity) {
+            if (color.startsWith('rgb')) { // Handle RGB or RGBA colors
+                return color.replace(/\)$/, `, ${opacity})`);
+            } else { // Assume other color formats (e.g., hex)
+                const colorObj = new Option().style;
+                colorObj.color = color;
+                return colorObj.color.replace(/\)$/, `, ${opacity})`);
+            }
         }
     };
 

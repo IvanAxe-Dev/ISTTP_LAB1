@@ -1,52 +1,115 @@
 ﻿@model IEnumerable<FinancesDomain.Models.SharedBudget>
 
+
 @{
     ViewData["Title"] = "Index";
+    var itemNum = 1;
+    var colorCodes = Model.Select(c => c.CommonCategory.CategoryColorHexCode).ToList();
 }
 
-<h1>Shared budgets</h1>
-
-<p>
-    <a asp-action="Create">Add new shared budget</a>
-</p>
+<h1 style="text-align:center; font-size:50px; margin-bottom:1%;">Shared Categories</h1>
 
 <table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.CommonCategoryId)
-            </th>
+    <thead class="table-head">
+        <tr id="head">
             <th>
                 @Html.DisplayNameFor(model => model.Title)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AddedUserId)
+                @Html.DisplayNameFor(model => model.CommonCategory)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AddedUser)
+                @Html.DisplayNameFor(model => model.CommonCategoryId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AddedUserId)
             </th>
             <th></th>
         </tr>
     </thead>
-    <tbody>
-@foreach (var item in Model) {
-        <tr>
+    <tbody class="table-content">
+        @foreach (var item in Model)
+        {
+            <tr id=@("category" + itemNum) data-id="@item.CommonCategoryId">
                 <td>
-                    @Html.DisplayFor(modelItem => item.Title)
+                    <b>@Html.DisplayFor(modelItem => item.Title)</b>
                 </td>
-
-            <td>
-                with @Html.DisplayFor(modelItem => item.AddedUser.Username)
-            </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.CommonCategory.Name)
                 </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+                <td>
+                    @Html.DisplayFor(modelItem => item.CommonCategory.TotalExpences) |
+                    <b>@Html.DisplayFor(modelItem => item.CommonCategory.ExpenditureLimit)</b>
+                </td>
+                <td>
+                    <b>You, @("@")@Html.DisplayFor(modelItem => item.AddedUser.Username)</b>
+                </td>
+                <td>
+                    <a class="btn btn-info" asp-action="NewTransaction" asp-route-id="@item.CommonCategory.Id">Add new expenditure</a>
+                    <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.Id">Edit category</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+<p>
+
+    <a class="btn btn-primary btn-green" asp-action="Create">Add new shared category</a>
+</p>
+
+<script>
+    const tableRows = document.querySelectorAll('table tr');
+    tableRows.forEach(row => {
+        if (row.id != 'head') {
+            row.addEventListener('click', () => {
+                const id = row.dataset.id;
+                // Option 1: Redirect
+                window.location.href = `/Categories/Details/${id}`;
+
+                // Option 2: AJAX Call (requires more setup)
+                // $.ajax(...)
+            });
+        }
+    });
+
+    window.onload = function () {
+        var colorCodes = @Html.Raw(Json.Serialize(colorCodes));
+
+        for (let i = 0; i <= colorCodes.length - 1; i++) {
+            const tr = document.getElementById(`category${i + 1}`);
+            if (colorCodes[i] !== null) {
+                tr.style.backgroundColor = colorCodes[i];
+            }
+            console.log(tr.style.backgroundColor);
+        }
+
+        const tableRows = document.querySelectorAll('table tr');
+        const tableCells = document.querySelectorAll('table td');
+
+        // Apply opacity to table rows' background color
+        tableRows.forEach(row => {
+            if (row.id !== 'head') { // Exclude the table header row
+                row.style.backgroundColor = modifyColorWithOpacity(row.style.backgroundColor, 0.7);
+            }
+        });
+
+        // Apply opacity to table cells' background color
+        tableCells.forEach(cell => {
+            cell.style.backgroundColor = modifyColorWithOpacity(cell.style.backgroundColor, 0.7);
+        });
+
+        // ... (Your existing code for color codes and click events) ...
+
+        // Helper function to modify color with opacity
+        function modifyColorWithOpacity(color, opacity) {
+            if (color.startsWith('rgb')) { // Handle RGB or RGBA colors
+                return color.replace(/\)$/, `, ${opacity})`);
+            } else { // Assume other color formats (e.g., hex)
+                const colorObj = new Option().style;
+                colorObj.color = color;
+                return colorObj.color.replace(/\)$/, `, ${opacity})`);
+            }
+        }
+    };
+
+</script>
