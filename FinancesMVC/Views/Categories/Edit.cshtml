@@ -24,10 +24,6 @@
                 <input asp-for="ExpenditureLimit" class="form-control" />
                 <span asp-validation-for="ExpenditureLimit" class="text-danger"></span>
             </div>
-            <div class="form-group">
-                <label class="control-label">Choose color:</label>
-                <input asp-for="CategoryColorHexCode" type='color' value="@ViewBag.Color" />
-            </div>
             <label class="form-group">
                 Should the category be controlled by a parent?
                 <input asp-for="IsParentControl" type="checkbox" />
@@ -41,15 +37,3 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
-
-<script>
-    $(document).ready(function () { // Note: function() is a shorter way to write $(document).ready()
-        $(".spectrum-picker").spectrum({ // Target the visible color picker input
-            clickoutFiresChange: true,
-            change: function (color) {
-                // Update the hidden input field
-                $("input[asp-for='CategoryColorHexCode']").val(color.toHexString());
-            }
-        });
-    });
-</script>

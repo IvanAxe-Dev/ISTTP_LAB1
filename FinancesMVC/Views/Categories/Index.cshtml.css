@@ -1,9 +1,17 @@
-﻿#create-btn{
-    border-radius:100%;
+﻿#create-btn {
+    border-radius: 100%;
 }
 
 .table {
     position: relative;
+    z-index: 2; /* Lower than the table */
+}
+
+#title {
+    text-align: center;
+    font-size: 50px;
+    margin-bottom: 2%;
+    z-index: 0; /* Lower than the table */
 }
 
 .table-head {
@@ -28,16 +36,12 @@
     transform: scale(1.05);
 }
 
-.table {
-    table-layout: fixed;
-    width: 100%; /* optional, set the table width */
+.table th,
+.table td {
+    /* Remove width settings if you had them; let content determine width */
+    text-align: center;
+    box-sizing: border-box;
 }
-
-    .table th,
-    .table td{
-        width: calc(100% / 4); /* adjust the divisor as needed */
-        text-align: center; /* optional, center the content */
-    }
 
 table {
     border-collapse: separate;
@@ -57,3 +61,30 @@ td, th {
     width: auto; /* Or set a specific width */
     text-align: left; /* Or use another alignment */
 }
+
+
+.table-wrapper {
+    background-color: rgba(255, 255, 255, 0.7);
+    width: 90%;
+    height: 80%;
+    position: absolute;
+    padding: 2.1%;
+    top: 50%;
+    left: 50%;
+    z-index: 1;
+    transform: translate(-50%, -50%); /* Key for precise centering */
+    overflow-y: auto; /* Or overflow-y: scroll if you always want a scrollbar */
+}
+
+    .table-wrapper::-webkit-scrollbar {
+        width: 10px; /* Adjust scrollbar width */
+    }
+
+    .table-wrapper::-webkit-scrollbar-track {
+        background: #f1f1f1; /* Color for the scrollbar track */
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb {
+        background-color: rgb(128, 128, 128, 0.5); /* Color for the scrollbar thumb */
+        border-radius: 5px; /* Add rounded corners to the thumb */
+    }

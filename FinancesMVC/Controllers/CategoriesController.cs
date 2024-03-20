@@ -77,11 +77,10 @@ namespace FinancesMVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,UserId,TotalExpences,CategoryColorHexCode,ExpenditureLimit,IsParentControl")] Category category)
+        public async Task<IActionResult> Create([Bind("Id,Name,UserId,TotalExpences,ExpenditureLimit,IsParentControl")] Category category)
         {
             category.Id = _context.Categories.ToList().Last().Id + 1;
             category.UserId = _context.Users.ToList()[0].Id;
-            Console.WriteLine(category.CategoryColorHexCode);
 
             ModelState.Clear();
             TryValidateModel(category);
@@ -110,7 +109,6 @@ namespace FinancesMVC.Controllers
                 return NotFound();
             }
             ViewBag.Name = category.Name;
-            ViewBag.Color = category.CategoryColorHexCode ?? "#3355cc";
             ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", category.UserId);
             return View(category);
         }
@@ -120,7 +118,7 @@ namespace FinancesMVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,UserId,TotalExpences,CategoryColorHexCode,ChosenGoalId,ExpenditureLimit,IsParentControl")] Category category)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,Name,UserId,TotalExpences,ChosenGoalId,ExpenditureLimit,IsParentControl")] Category category)
         {
             if (id != category.Id)
             {

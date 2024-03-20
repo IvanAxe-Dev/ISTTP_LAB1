@@ -84,7 +84,6 @@ namespace FinancesMVC.Controllers
             {
                 if ((double)category.TotalExpences > category.ExpenditureLimit)
                 {
-                    category.CategoryColorHexCode = "#d73d23";
                     transaction.BudgetOverflown = true;
                 }
             }

@@ -28,29 +28,72 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.StartTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.EndTime)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.CalculatedExpances)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.ChosenCategory.Name)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.User.Id)
-            </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.StartTime)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EndTime)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CalculatedExpances)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ChosenCategory.Name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.User.Id)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+<div class="row">
+    <div class="col-3">
+        <div style="background-color: rgba(255, 255, 255, 0.7);" id="spentByDayChart"></div>
+    </div>
+</div>
+
+
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    google.charts.load('current', { 'packages': ['corechart'] });
+    google.charts.setOnLoadCallback(drawCharts);
+
+    function drawCharts() {
+        fetch('/api/charts/spentByDay')
+            .then(response => response.json())
+            .then(data => {
+                const dataTable = new google.visualization.DataTable();
+                dataTable.addColumn('string', 'Day');
+                dataTable.addColumn('number', 'Money spent');
+
+                data.forEach(item => {
+                    const date = item.day + ' ' + item.month;
+                    dataTable.addRow([date, item.moneySpent]);
+                });
+
+                const options = {
+                    title: 'Money spent by days',
+                    width: 600,
+                    height: 400,
+                    legend: { position: 'none' },
+                    backgroundColor: 'rgba(255, 255, 255, 0.7)'
+                };
+
+                const chart = new google.visualization.ColumnChart(document.getElementById('spentByDayChart'));
+
+                chart.draw(dataTable, options);
+            });
+    }
+</script>
+
+

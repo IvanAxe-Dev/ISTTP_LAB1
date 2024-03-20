@@ -71,7 +71,6 @@ public partial class Db1Context : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
                 .HasColumnName("name");
-            entity.Property(e => e.CategoryColorHexCode).HasColumnName("categoryColorHexCode");
             entity.Property(e => e.TotalExpences)
                 .HasColumnType("money")
                 .HasColumnName("totalExpences");

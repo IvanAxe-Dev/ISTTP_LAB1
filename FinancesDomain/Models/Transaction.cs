@@ -17,7 +17,7 @@ public partial class Transaction
     public decimal MoneySpent { get; set; }
 
     [Display(Name = "When?")]
-    public DateTime? Date { get; set; }
+    public DateTime Date { get; set; }
 
     public bool? BudgetOverflown { get; set; }
 

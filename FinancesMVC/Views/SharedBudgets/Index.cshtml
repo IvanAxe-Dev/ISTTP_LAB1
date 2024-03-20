@@ -4,7 +4,6 @@
 @{
     ViewData["Title"] = "Index";
     var itemNum = 1;
-    var colorCodes = Model.Select(c => c.CommonCategory.CategoryColorHexCode).ToList();
 }
 
 <h1 style="text-align:center; font-size:50px; margin-bottom:1%;">Shared Categories</h1>
@@ -73,7 +72,6 @@
     });
 
     window.onload = function () {
-        var colorCodes = @Html.Raw(Json.Serialize(colorCodes));
 
         for (let i = 0; i <= colorCodes.length - 1; i++) {
             const tr = document.getElementById(`category${i + 1}`);
