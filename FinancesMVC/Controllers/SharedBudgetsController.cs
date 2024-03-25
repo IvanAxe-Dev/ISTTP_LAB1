@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using FinancesDomain.Models;
-using FinancesMVC;
+using FinancesMVC.Models;
+using FinancesMVC.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace FinancesMVC.Controllers
 {
-    public class SharedBudgetsController : Controller
+    public class SharedBudgetsController : AuthorizeController
     {
         private readonly Db1Context _context;
 
@@ -22,7 +24,12 @@ namespace FinancesMVC.Controllers
         // GET: SharedBudgets
         public async Task<IActionResult> Index()
         {
-            var db1Context = _context.SharedBudgets.Include(s => s.AddedUser).Include(p => p.CommonCategory);
+            var db1Context = _context.SharedBudgets
+                .Include(s => s.OwnerUser)
+                .Include(p => p.CommonCategory)
+                .Where(c => c.OwnerId == IdentityUserId ||
+                    (c.AddedUsersId != null && c.AddedUsersId.Contains(IdentityUserId)));
+
             return View(await db1Context.ToListAsync());
         }
 
@@ -35,7 +42,7 @@ namespace FinancesMVC.Controllers
             }
 
             var sharedBudget = await _context.SharedBudgets
-                .Include(s => s.AddedUser)
+                .Include(s => s.AddedUsersId)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (sharedBudget == null)
             {
@@ -84,7 +91,7 @@ namespace FinancesMVC.Controllers
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AddedUserId"] = new SelectList(_context.Categories, "Id", "Name", sharedBudget.AddedUserId);
+            ViewData["AddedUserId"] = new SelectList(_context.Categories, "Id", "Name", sharedBudget.AddedUsersId);
             return View(sharedBudget);
         }
 
@@ -101,7 +108,7 @@ namespace FinancesMVC.Controllers
             {
                 return NotFound();
             }
-            ViewData["AddedUserId"] = new SelectList(_context.Categories, "Id", "Name", sharedBudget.AddedUserId);
+            ViewData["AddedUserId"] = new SelectList(_context.Categories, "Id", "Name", sharedBudget.AddedUsersId);
             return View(sharedBudget);
         }
 
@@ -137,7 +144,7 @@ namespace FinancesMVC.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["AddedUserId"] = new SelectList(_context.Categories, "Id", "Name", sharedBudget.AddedUserId);
+            ViewData["AddedUserId"] = new SelectList(_context.Categories, "Id", "Name", sharedBudget.AddedUsersId);
             return View(sharedBudget);
         }
 
@@ -150,7 +157,7 @@ namespace FinancesMVC.Controllers
             }
 
             var sharedBudget = await _context.SharedBudgets
-                .Include(s => s.AddedUser)
+                .Include(s => s.AddedUsersId)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (sharedBudget == null)
             {

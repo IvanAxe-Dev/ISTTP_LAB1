@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
-namespace FinancesDomain.Models;
+namespace FinancesMVC.Models;
 
 public partial class Transaction
 {
     public int Id { get; set; }
 
-    public int? UserId { get; set; }
+    public Guid? UserId { get; set; }
 
     [Display(Name = "Money spent")]
     [MoneySpentValidation]

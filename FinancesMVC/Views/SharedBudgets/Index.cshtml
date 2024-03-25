@@ -1,4 +1,4 @@
-﻿@model IEnumerable<FinancesDomain.Models.SharedBudget>
+﻿@model IEnumerable<FinancesMVC.Models.SharedBudget>
 
 
 @{
@@ -21,7 +21,7 @@
                 @Html.DisplayNameFor(model => model.CommonCategoryId)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AddedUserId)
+                @Html.DisplayNameFor(model => model.AddedUsersId)
             </th>
             <th></th>
         </tr>
@@ -41,8 +41,8 @@
                     <b>@Html.DisplayFor(modelItem => item.CommonCategory.ExpenditureLimit)</b>
                 </td>
                 <td>
-                    <b>You, @("@")@Html.DisplayFor(modelItem => item.AddedUser.Username)</b>
-                </td>
+@*                     <b>You, @("@")@Html.DisplayFor(modelItem => item.AddedUser.UserName)</b>
+ *@                </td>
                 <td>
                     <a class="btn btn-info" asp-action="NewTransaction" asp-route-id="@item.CommonCategory.Id">Add new expenditure</a>
                     <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.Id">Edit category</a>

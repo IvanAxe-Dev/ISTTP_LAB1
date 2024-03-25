@@ -5,12 +5,13 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using FinancesDomain.Models;
-using FinancesMVC;
+using FinancesMVC.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace FinancesMVC.Controllers
 {
-    public class StatsController : Controller
+    public class StatsController : AuthorizeController
     {
         private readonly Db1Context _context;
 
@@ -22,7 +23,9 @@ namespace FinancesMVC.Controllers
         // GET: Stats
         public async Task<IActionResult> Index()
         {
-            var db1Context = _context.Stats.Include(s => s.ChosenCategory).Include(s => s.User);
+            var db1Context = _context.Stats.Include(s => s.ChosenCategory)
+                .Include(s => s.User)
+                .Where(c => c.UserId == IdentityUserId);
             return View(await db1Context.ToListAsync());
         }
 

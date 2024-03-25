@@ -1,4 +1,4 @@
-﻿@model IEnumerable<FinancesDomain.Models.UserProfile>
+﻿@model IEnumerable<FinancesMVC.Models.UserProfile>
 
 @{
     ViewData["Title"] = "Index";
@@ -52,8 +52,8 @@
 
 
     <div id="uandpp" style="display:flex; flex-direction: column; flex: 1; width: 50%">
-        <h1>&commat; @Html.DisplayFor(modelItem => Model.First().User.Username)</h1>
-        <img id="profile-pic" alt="profile pic" src="https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1677509740.jpg">
+@*         <h1>&commat; @Html.DisplayFor(modelItem => Model.First().User.UserName)</h1>
+ *@        <img id="profile-pic" alt="profile pic" src="https://www.shutterstock.com/image-vector/default-avatar-profile-icon-social-600nw-1677509740.jpg">
     </div>
 </div>
 

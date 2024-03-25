@@ -1,31 +1,31 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using FinancesMVC.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using FinancesDomain.Models;
-using Microsoft.AspNetCore.Authorization;
 
 namespace FinancesMVC.Controllers
 {
-    public class UsersController : Controller
+    public class UserProfileController : AuthorizeController
     {
         private readonly Db1Context _context;
 
-        public UsersController(Db1Context context)
+        public UserProfileController(Db1Context context)
         {
             _context = context;
         }
 
-        // GET: Users
+        // GET: UserProfiles
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Users.ToListAsync());
+            var db1Context = _context.UserProfiles
+                .Include(u => u.User)
+                .Where(c => c.UserId == IdentityUserId);
+
+            return View(await db1Context.ToListAsync());
         }
 
-        // GET: Users/Details/5
+        // GET: UserProfiles/Details/5
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -33,39 +33,18 @@ namespace FinancesMVC.Controllers
                 return NotFound();
             }
 
-            var user = await _context.Users
+            var userProfile = await _context.UserProfiles
+                .Include(u => u.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (user == null)
+            if (userProfile == null)
             {
                 return NotFound();
             }
 
-            return View(user);
+            return View(userProfile);
         }
 
-        // GET: Users/Create
-        public IActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: Users/Create
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Username,AccountMoney,IsMature,CreatedAt")] User user)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(user);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(user);
-        }
-
-        // GET: Users/Edit/5
+        // GET: UserProfiles/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -73,22 +52,23 @@ namespace FinancesMVC.Controllers
                 return NotFound();
             }
 
-            var user = await _context.Users.FindAsync(id);
-            if (user == null)
+            var userProfile = await _context.UserProfiles.FindAsync(id);
+            if (userProfile == null)
             {
                 return NotFound();
             }
-            return View(user);
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", userProfile.UserId);
+            return View(userProfile);
         }
 
-        // POST: Users/Edit/5
+        // POST: UserProfiles/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("Id,Username,AccountMoney,IsMature,CreatedAt")] User user)
+        public async Task<IActionResult> Edit(int id, [Bind("Id,UserId,FirstName,LastName,Birthdate,Country,AboutMe")] UserProfile userProfile)
         {
-            if (id != user.Id)
+            if (id != userProfile.Id)
             {
                 return NotFound();
             }
@@ -97,12 +77,12 @@ namespace FinancesMVC.Controllers
             {
                 try
                 {
-                    _context.Update(user);
+                    _context.Update(userProfile);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!UserExists(user.Id))
+                    if (!UserProfileExists(userProfile.Id))
                     {
                         return NotFound();
                     }
@@ -113,10 +93,11 @@ namespace FinancesMVC.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            return View(user);
+            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", userProfile.UserId);
+            return View(userProfile);
         }
 
-        // GET: Users/Delete/5
+        // GET: UserProfiles/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
             if (id == null)
@@ -124,34 +105,35 @@ namespace FinancesMVC.Controllers
                 return NotFound();
             }
 
-            var user = await _context.Users
+            var userProfile = await _context.UserProfiles
+                .Include(u => u.User)
                 .FirstOrDefaultAsync(m => m.Id == id);
-            if (user == null)
+            if (userProfile == null)
             {
                 return NotFound();
             }
 
-            return View(user);
+            return View(userProfile);
         }
 
-        // POST: Users/Delete/5
+        // POST: UserProfiles/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var user = await _context.Users.FindAsync(id);
-            if (user != null)
+            var userProfile = await _context.UserProfiles.FindAsync(id);
+            if (userProfile != null)
             {
-                _context.Users.Remove(user);
+                _context.UserProfiles.Remove(userProfile);
             }
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        private bool UserExists(int id)
+        private bool UserProfileExists(int id)
         {
-            return _context.Users.Any(e => e.Id == id);
+            return _context.UserProfiles.Any(e => e.Id == id);
         }
     }
 }

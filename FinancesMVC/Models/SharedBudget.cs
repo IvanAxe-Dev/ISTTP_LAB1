@@ -2,17 +2,19 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace FinancesDomain.Models;
+namespace FinancesMVC.Models;
 
 public partial class SharedBudget
 {
     public int Id { get; set; }
 
     [Display(Name = "Budget")]
-    public string Title { get; set; }
+    public string? Title { get; set; }
+
+    public Guid OwnerId { get; set; }
 
     [Display(Name = "Members")]
-    public int AddedUserId { get; set; }
+    public List<Guid>? AddedUsersId { get; set; }
 
     [Display(Name = "Spent | Limit")]
     public int CommonCategoryId { get; set; }
@@ -20,5 +22,5 @@ public partial class SharedBudget
     [Display(Name = "Category")]
     public virtual Category CommonCategory { get; set; } = null!;
 
-    public virtual User AddedUser { get; set; } = null!;
+    public virtual User OwnerUser { get; set; } = null!;
 }

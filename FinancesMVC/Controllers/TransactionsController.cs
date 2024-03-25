@@ -5,18 +5,19 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using FinancesDomain.Models;
-using FinancesMVC;
+using FinancesMVC.Models;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using FinancesMVC.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 
 namespace FinancesMVC.Controllers
 {
-
-    public class TransactionsController : Controller
+    public class TransactionsController : AuthorizeController
     {
         private readonly Db1Context _context;
 
-        public TransactionsController(Db1Context context)
+        public TransactionsController(Db1Context context) 
         {
             _context = context;
         }
@@ -62,7 +63,7 @@ namespace FinancesMVC.Controllers
             ViewData["CompletedAchievementId"] = new SelectList(_context.Achievements, "Id", "Id");
             ViewData["ExpenditureCategoryId"] = new SelectList(_context.Categories, "Id", "Name");
             ViewData["MessageId"] = new SelectList(_context.Messages, "Id", "Id");
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id");
+            ViewData["UserId"] = IdentityUserId;
             return View();
         }
 
@@ -71,10 +72,8 @@ namespace FinancesMVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,UserId,MoneySpent,BudgetOverflown,MessageId,CompletedAchievementId,ExpenditureCategoryId,ExpenditureNote")] Transaction transaction)
+        public async Task<IActionResult> Create([Bind("MoneySpent,BudgetOverflown,MessageId,CompletedAchievementId,ExpenditureCategoryId,ExpenditureNote")] Transaction transaction)
         {
-            transaction.Id = _context.Transactions.ToList().Last().Id + 1;
-            transaction.UserId = _context.Users.ToList()[0].Id;
             transaction.Date = DateTime.Now;
             var category = await _context.Categories.FindAsync(transaction.ExpenditureCategoryId);
             if (category == null) return NotFound();
@@ -85,12 +84,13 @@ namespace FinancesMVC.Controllers
                 if ((double)category.TotalExpences > category.ExpenditureLimit)
                 {
                     transaction.BudgetOverflown = true;
-                }
+                }   
             }
 
             _context.Update(category);
             if (ModelState.IsValid)
             {
+                transaction.UserId = IdentityUserId;
                 _context.Add(transaction);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index), new { category.Id, category.Name });
@@ -98,7 +98,7 @@ namespace FinancesMVC.Controllers
             ViewData["CompletedAchievementId"] = new SelectList(_context.Achievements, "Id", "Id", transaction.CompletedAchievementId);
             ViewData["ExpenditureCategoryId"] = new SelectList(_context.Categories, "Id", "Name", transaction.ExpenditureCategoryId);
             ViewData["MessageId"] = new SelectList(_context.Messages, "Id", "Id", transaction.MessageId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", transaction.UserId);
+            ViewData["UserId"] = IdentityUserId;
             return View(transaction);
         }
 
@@ -108,6 +108,11 @@ namespace FinancesMVC.Controllers
             var category = _context.Categories.Find(categoryId);
 
             if (id == null)
+            {
+                return NotFound();
+            }
+
+            if (category == null)
             {
                 return NotFound();
             }
@@ -124,7 +129,7 @@ namespace FinancesMVC.Controllers
             ViewData["CompletedAchievementId"] = new SelectList(_context.Achievements, "Id", "Id", transaction.CompletedAchievementId);
             ViewData["ExpenditureCategoryId"] = new SelectList(_context.Categories, "Id", "Name", transaction.ExpenditureCategoryId);
             ViewData["MessageId"] = new SelectList(_context.Messages, "Id", "Id", transaction.MessageId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", transaction.UserId);
+            ViewData["UserId"] = IdentityUserId;
             return View(transaction);
         }
 
@@ -138,6 +143,11 @@ namespace FinancesMVC.Controllers
             var category = _context.Categories.Find(categoryId);
 
             if (id != transaction.Id)
+            {
+                return NotFound();
+            }
+
+            if (category == null)
             {
                 return NotFound();
             }
@@ -172,7 +182,7 @@ namespace FinancesMVC.Controllers
             ViewData["CompletedAchievementId"] = new SelectList(_context.Achievements, "Id", "Id", transaction.CompletedAchievementId);
             ViewData["ExpenditureCategoryId"] = new SelectList(_context.Categories, "Id", "Name", transaction.ExpenditureCategoryId);
             ViewData["MessageId"] = new SelectList(_context.Messages, "Id", "Id", transaction.MessageId);
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", transaction.UserId);
+            ViewData["UserId"] = IdentityUserId;
             return View(transaction);
         }
 

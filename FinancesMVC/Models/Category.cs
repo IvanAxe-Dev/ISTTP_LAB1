@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace FinancesDomain.Models;
+namespace FinancesMVC.Models;
 
 public partial class Category
 {
@@ -13,7 +13,7 @@ public partial class Category
     [Required(ErrorMessage ="This field should be filled.")]
     public string? Name { get; set; }
 
-    public int? UserId { get; set; }
+    public Guid? UserId { get; set; }
 
     [Display(Name = "Money spent")]
     [Required(ErrorMessage = "This field should be filled.")]

@@ -1,4 +1,4 @@
-﻿@model FinancesDomain.Models.SharedBudget
+﻿@model FinancesMVC.Models.SharedBudget
 
 @{
     ViewData["Title"] = "Details";
@@ -17,11 +17,11 @@
             @Html.DisplayFor(model => model.CommonCategoryId)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.AddedUser)
+            @Html.DisplayNameFor(model => model.AddedUsersId)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.AddedUser.Username)
-        </dd>
+@*             @Html.DisplayFor(model => model.AddedUser.UserName)
+ *@        </dd>
     </dl>
 </div>
 <div>

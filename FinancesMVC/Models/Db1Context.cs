@@ -1,18 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
-using FinancesDomain.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
-namespace FinancesMVC;
+namespace FinancesMVC.Models;
 
-public partial class Db1Context : DbContext
+public partial class Db1Context : IdentityDbContext<User, IdentityRole<Guid>, Guid>
 {
-    public Db1Context()
-    {
-    }
-
-    public Db1Context(DbContextOptions<Db1Context> options)
-        : base(options)
+    public Db1Context(DbContextOptions<Db1Context> options) : base(options)
     {
     }
 
@@ -32,12 +28,10 @@ public partial class Db1Context : DbContext
 
     public virtual DbSet<UserProfile> UserProfiles { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=IVANS-LAP\\SQLEXPRESS; Database=db1; Trusted_Connection=True; TrustServerCertificate=True;");
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        base.OnModelCreating(modelBuilder); // Important!
+
         modelBuilder.Entity<Achievement>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__achievem__3213E83F0637D22E");
@@ -46,7 +40,8 @@ public partial class Db1Context : DbContext
 
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
-                .HasColumnName("id");
+                .HasColumnName("id")
+                .ValueGeneratedOnAdd();
             entity.Property(e => e.Status)
                 .HasDefaultValue(false)
                 .HasColumnName("status");
@@ -63,7 +58,9 @@ public partial class Db1Context : DbContext
 
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
-                .HasColumnName("id");
+                .HasColumnName("id")
+                .ValueGeneratedOnAdd();
+
             entity.Property(e => e.ExpenditureLimit).HasColumnName("expenditureLimit");
             entity.Property(e => e.IsParentControl)
                 .HasDefaultValue(false)
@@ -91,7 +88,8 @@ public partial class Db1Context : DbContext
 
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
-                .HasColumnName("id");
+                .HasColumnName("id")
+                .ValueGeneratedOnAdd();
             entity.Property(e => e.Text)
                 .HasMaxLength(255)
                 .HasColumnName("text");
@@ -108,15 +106,18 @@ public partial class Db1Context : DbContext
 
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
-                .HasColumnName("id");
-            entity.Property(e => e.AddedUserId).HasColumnName("addedUserId");
+                .HasColumnName("id")
+                .ValueGeneratedOnAdd();
+
+            entity.Property(e => e.AddedUsersId).HasColumnName("addedUserId");
             entity.Property(e => e.CommonCategoryId).HasColumnName("commonCategoryId");
             entity.Property(e => e.Title).HasColumnName("title");
 
-            entity.HasOne(d => d.AddedUser).WithMany(p => p.SharedBudgets)
-                .HasForeignKey(d => d.AddedUserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__shared_addedUserId");
+            entity.HasOne(d => d.OwnerUser)
+          .WithMany(p => p.SharedBudgets)
+          .HasForeignKey(d => d.OwnerId)
+          .OnDelete(DeleteBehavior.ClientSetNull)
+          .HasConstraintName("FK_sharedBudget_OwnerUser");
 
             entity.HasOne(d => d.CommonCategory).WithMany(p => p.SharedBudgets)
                 .HasForeignKey(d => d.CommonCategoryId)
@@ -133,7 +134,9 @@ public partial class Db1Context : DbContext
 
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
-                .HasColumnName("id");
+                .HasColumnName("id")
+                .ValueGeneratedOnAdd();
+
             entity.Property(e => e.CalculatedExpances).HasColumnName("calculatedExpances");
             entity.Property(e => e.ChosenCategoryId).HasColumnName("chosenCategoryId");
             entity.Property(e => e.EndTime).HasColumnName("endTime");
@@ -157,7 +160,9 @@ public partial class Db1Context : DbContext
 
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
-                .HasColumnName("id");
+                .HasColumnName("id")
+                .ValueGeneratedOnAdd();
+
             entity.Property(e => e.BudgetOverflown)
                 .HasDefaultValue(false)
                 .HasColumnName("budgetOverflown");
@@ -196,13 +201,12 @@ public partial class Db1Context : DbContext
 
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
-                .HasColumnName("id");
-            entity.Property(e => e.AccountMoney)
-                .HasColumnType("money")
-                .HasColumnName("accountMoney");
+                .HasColumnName("id")
+                .ValueGeneratedOnAdd();
+
             entity.Property(e => e.CreatedAt).HasColumnName("createdAt");
             entity.Property(e => e.IsMature).HasColumnName("isMature");
-            entity.Property(e => e.Username)
+            entity.Property(e => e.UserName)
                 .HasMaxLength(255)
                 .HasColumnName("username");
         });
@@ -219,7 +223,9 @@ public partial class Db1Context : DbContext
 
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
-                .HasColumnName("id");
+                .HasColumnName("id")
+                .ValueGeneratedOnAdd();
+
             entity.Property(e => e.AboutMe)
                 .HasColumnType("text")
                 .HasColumnName("aboutMe");

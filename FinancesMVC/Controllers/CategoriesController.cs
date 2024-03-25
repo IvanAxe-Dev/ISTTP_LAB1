@@ -1,18 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using FinancesMVC.Models;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using FinancesDomain.Models;
-using FinancesMVC;
-using Microsoft.IdentityModel.Tokens;
 
 namespace FinancesMVC.Controllers
 {
-
-    public class CategoriesController : Controller
+    public class CategoriesController : AuthorizeController
     {
         private readonly Db1Context _context;
 
@@ -24,7 +18,10 @@ namespace FinancesMVC.Controllers
         // GET: Categories
         public async Task<IActionResult> Index()
         {
-            var db1Context = _context.Categories.Include(c => c.User).Where(c => c.SharedBudgets.Count() == 0);
+
+            var db1Context = _context.Categories.Include(c => c.User)
+                .Where(c => c.SharedBudgets.Count() == 0)
+                .Where(c => c.UserId == IdentityUserId);
             return View(await db1Context.ToListAsync());
         }
 
@@ -38,7 +35,9 @@ namespace FinancesMVC.Controllers
 
             var category = await _context.Categories
                 .Include(c => c.User)
+                .Where(c => c.UserId == IdentityUserId)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (category == null)
             {
                 return NotFound();
@@ -57,7 +56,9 @@ namespace FinancesMVC.Controllers
 
             var category = await _context.Categories
                 .Include(c => c.User)
+                .Where(c => c.UserId == IdentityUserId)
                 .FirstOrDefaultAsync(m => m.Id == id);
+
             if (category == null)
             {
                 return NotFound();
@@ -79,14 +80,12 @@ namespace FinancesMVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Name,UserId,TotalExpences,ExpenditureLimit,IsParentControl")] Category category)
         {
-            category.Id = _context.Categories.ToList().Last().Id + 1;
-            category.UserId = _context.Users.ToList()[0].Id;
-
             ModelState.Clear();
             TryValidateModel(category);
 
             if (ModelState.IsValid)
             {
+                category.UserId = IdentityUserId;
                 _context.Add(category);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -109,7 +108,7 @@ namespace FinancesMVC.Controllers
                 return NotFound();
             }
             ViewBag.Name = category.Name;
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", category.UserId);
+            ViewData["UserId"] = IdentityUserId;
             return View(category);
         }
 
@@ -129,6 +128,7 @@ namespace FinancesMVC.Controllers
             {
                 try
                 {
+                    category.UserId = IdentityUserId;
                     _context.Update(category);
                     await _context.SaveChangesAsync();
                 }
@@ -145,7 +145,7 @@ namespace FinancesMVC.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["UserId"] = new SelectList(_context.Users, "Id", "Id", category.UserId);
+            ViewData["UserId"] = IdentityUserId;
             return View(category);
         }
 

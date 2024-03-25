@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace FinancesDomain.Models;
+namespace FinancesMVC.Models;
 
 public partial class UserProfile
 {
     public int Id { get; set; }
 
-    public int? UserId { get; set; }
+    public Guid? UserId { get; set; }
 
     public string? FirstName { get; set; }
 
