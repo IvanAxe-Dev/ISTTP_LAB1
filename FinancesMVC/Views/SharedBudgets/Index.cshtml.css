@@ -61,3 +61,29 @@ td, th {
 .tr-disabled{
     background-color:black !important;
 }
+
+.table-wrapper {
+    background-color: rgba(255, 255, 255, 0.7);
+    width: 90%;
+    height: 80%;
+    position: absolute;
+    padding: 2.1%;
+    top: 50%;
+    left: 50%;
+    z-index: 1;
+    transform: translate(-50%, -50%); /* Key for precise centering */
+    overflow-y: auto; /* Or overflow-y: scroll if you always want a scrollbar */
+}
+
+    .table-wrapper::-webkit-scrollbar {
+        width: 10px; /* Adjust scrollbar width */
+    }
+
+    .table-wrapper::-webkit-scrollbar-track {
+        background: #f1f1f1; /* Color for the scrollbar track */
+    }
+
+    .table-wrapper::-webkit-scrollbar-thumb {
+        background-color: rgb(128, 128, 128, 0.5); /* Color for the scrollbar thumb */
+        border-radius: 5px; /* Add rounded corners to the thumb */
+    }

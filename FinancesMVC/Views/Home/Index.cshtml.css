@@ -1,0 +1,21 @@
+﻿#login{
+    margin-top:4%;
+}
+
+.lead {
+    margin-top: 5%;
+}
+
+#equal-height-card {
+    height: 300px; /* Adjust the height as needed */
+}
+
+.container .row {
+    display: grid;
+    gap: 10px; /* Adjust the gap as desired */
+}
+
+#wrapper {
+    margin-top:1.5%;
+    background-color: rgba(255, 255, 255, 0.6) !important;
+}

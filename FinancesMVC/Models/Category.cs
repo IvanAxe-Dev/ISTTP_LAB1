@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace FinancesMVC.Models;
 
@@ -18,7 +19,7 @@ public partial class Category
     [Display(Name = "Money spent")]
     [Required(ErrorMessage = "This field should be filled.")]
     [DataType(DataType.Currency)]
-    public decimal TotalExpences { get; set; } = 0;
+    public decimal TotalExpences { get => Transactions.Sum(x => x.MoneySpent); }
 
     [Display(Name = "Expenditure limit")]
     [Required(ErrorMessage = "This field should be filled.")]

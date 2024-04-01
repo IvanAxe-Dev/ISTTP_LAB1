@@ -1,13 +1,27 @@
-﻿@model FinancesMVC.Models.Category
+﻿@model FinancesMVC.ViewModels.CategoryViewModel
+﻿@using Microsoft.AspNetCore.Identity;
+@inject UserManager<User> userManager
 
 @{
     ViewData["Title"] = "Create";
+
+    var user = await userManager.GetUserAsync(User);
+    var displayUsers = ViewBag.IsShared ? new SelectList(ViewData["Users"] as IEnumerable<string>) : null;
 }
-<script src='spectrum.js'></script>
-<link rel='stylesheet' href='spectrum.css' />
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
+</head>
+
 <div class="table-wrapper">
 
-    <h1>Add new category</h1>
+    <h1>
+        Add new
+        @if (ViewBag.IsShared)
+        {
+            <text> shared </text>
+        }
+        category
+    </h1>
     <hr />
     <div class="row">
         <div class="col-md-4">
@@ -15,20 +29,40 @@
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
                     <label class="control-label">New category name</label>
-                    <input asp-for="Name" class="form-control" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
+                    <input asp-for="Category.Name" class="form-control" />
+                    <span asp-validation-for="Category.Name" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label asp-for="ExpenditureLimit" class="control-label"></label>
-                    <input asp-for="ExpenditureLimit" class="form-control" />
-                    <span asp-validation-for="ExpenditureLimit" class="text-danger"></span>
+                    <label asp-for="Category.ExpenditureLimit" class="control-label"></label>
+                    <input asp-for="Category.ExpenditureLimit" class="form-control" />
+                    <span asp-validation-for="Category.ExpenditureLimit" class="text-danger"></span>
                 </div>
-                <div class="form-group">
-                    <label class="container">
-                        Should the category be controlled by a parent?
-                        <input asp-for="IsParentControl" type="checkbox" />
-                    </label>
-                </div>
+                @if (!user.IsMature)
+                {
+                    <div class="form-group">
+                        <label class="container">
+                            Should the category be controlled by a parent?
+                            <input asp-for="Category.IsParentControl" type="checkbox" />
+                        </label>
+                    </div>
+                }
+                @if (ViewBag.IsShared)
+                {
+                    <div class="form-group">
+                        <label style="margin-bottom: 1% !important;" asp-for="SelectedUsers" class="control-label">Select members to add</label>
+
+                        <div class="search-select-container">
+                            <input type="text" class="form-control user-search" placeholder="Search for a friend..." />
+                            <select asp-for="SelectedUsers" class="form-control" id="userSelect" asp-items="displayUsers" style="display: none;">
+                            </select>
+                            <div id="selectedUsersContainer">
+                            </div>
+                        </div>
+
+                        <span asp-validation-for="SelectedUsers" class="text-danger"></span>
+                    </div>
+                    <input type="hidden" id="selectedUsersInput" name="selectedUsers" />
+                }
                 <div class="form-group">
                     <input type="submit" value="Create" class="btn btn-primary" />
                 </div>
@@ -36,7 +70,14 @@
         </div>
     </div>
     <div>
-        <a class="btn btn-outline-primary" asp-action="Index">Back to List</a>
+        @if (ViewBag.IsShared)
+        {
+            <a class="btn btn-outline-primary" asp-action="Index" asp-controller="SharedBudgets">Back to List</a>
+        }
+        else
+        {
+            <a class="btn btn-outline-primary" asp-action="Index">Back to List</a>
+        }
     </div>
 </div>
 
@@ -46,3 +87,84 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 }
+
+<script>
+    $(document).ready(function () {
+        var selectedUsers = [];
+        var allOptions = $('#userSelect option').clone();
+
+        $('#userSelect').attr('multiple', false);
+
+        $('.user-search').on('input', function () {
+            var searchText = $(this).val().toLowerCase();
+
+            if (searchText === '') {
+                $('#userSelect').css('display', 'none');
+                $('#userSelect-no-matches').hide();
+            } else {
+                var filteredOptions = allOptions.filter(function () {
+                    return $(this).text().toLowerCase().indexOf(searchText) !== -1 && !selectedUsers.includes($(this).val());
+                });
+
+                $('#userSelect').empty().append(filteredOptions);
+
+                let visibleOptions = $('#userSelect option').length;
+                $('#userSelect').attr('size', Math.min(visibleOptions, 5));
+
+                if (visibleOptions > 0) {
+                    $('#userSelect').css('display', 'inline-block');
+                    $('#userSelect-no-matches').hide();
+                } else {
+                    $('#userSelect-no-matches').show();
+                    if ($('#userSelect-no-matches:visible').length === 0)
+                        $('<div id="userSelect-no-matches" class="no-matches">No matches found</div>').insertAfter('#userSelect');
+
+                    $('#userSelect').css('display', 'none');
+                }
+            }
+        });
+
+        var parentDiv = $('<div style="display: flex; flex-direction: row; gap: 5px;"></div>');
+
+        $('#userSelect').on('change click', function () {
+            var selectedOption = $(this).val();
+            if (!selectedOption || selectedUsers.includes(selectedOption)) return; // Ignore if no option is selected or if the option is already selected
+
+            selectedUsers.push(selectedOption);
+
+            var newDiv = $('<div class="selected-user">' + selectedOption +
+                '<button class="remove-user">X</button></div>');
+
+            parentDiv.append(newDiv);
+
+            $(this).after(parentDiv);
+
+            $('.user-search')
+                .val('')
+                .trigger('input');
+        });
+
+        $(document).on('click', '.remove-user', function () {
+            var userToRemove = $(this).parent().text().slice(0, -1);
+
+            selectedUsers = selectedUsers.filter(function (user) {
+                return user !== userToRemove;
+            });
+
+            $(this).parent().remove();
+
+            allOptions.each(function () {
+                if ($(this).val() === userToRemove) {
+                    $('#userSelect').append($(this).clone());
+                }
+            });
+        });
+
+        $('form').on('submit', function (event) {
+            // selectedUsers = selectedUsers.flat();
+            $('#selectedUsersInput').val(JSON.stringify(selectedUsers));
+        });
+    });
+
+
+</script>

@@ -19,7 +19,7 @@
 </head>
 <body>
     <header>
-        <nav style="background-color: rgba(255, 255, 255, 0.05) !important; border-bottom: none !important;"
+        <nav style="background-color: rgba(255, 255, 255, 0.1) !important; border-bottom: none !important;"
              class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
             <div class="container-fluid">
                 @if (signInManager.IsSignedIn(User))
@@ -39,9 +39,11 @@
                     <ul class="navbar-nav flex-grow-1">
                         @if (signInManager.IsSignedIn(User))
                         {
+
                             <li style="margin-left:1%;" class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="SharedBudgets" asp-action="Index">Shared Budgets</a>
                             </li>
+
                             <li style="margin-left:1%;" class="nav-item">
                                 <a class="nav-link text-dark" asp-area="" asp-controller="Stats" asp-action="Index">Stats</a>
                             </li>

@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using FinancesMVC.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using FinancesMVC.Models;
-using FinancesMVC.Models;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
 
 namespace FinancesMVC.Controllers
 {
@@ -24,13 +18,13 @@ namespace FinancesMVC.Controllers
         // GET: SharedBudgets
         public async Task<IActionResult> Index()
         {
-            var db1Context = _context.SharedBudgets
+            var sharedBudgets = _context.SharedBudgets
                 .Include(s => s.OwnerUser)
                 .Include(p => p.CommonCategory)
                 .Where(c => c.OwnerId == IdentityUserId ||
                     (c.AddedUsersId != null && c.AddedUsersId.Contains(IdentityUserId)));
 
-            return View(await db1Context.ToListAsync());
+            return View(await sharedBudgets.ToListAsync());
         }
 
         // GET: SharedBudgets/Details/5

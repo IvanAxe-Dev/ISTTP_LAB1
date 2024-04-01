@@ -1,7 +1,46 @@
-﻿@{
+﻿﻿@using Microsoft.AspNetCore.Identity;
+@inject SignInManager<User> signInManager
+
+@{
     ViewData["Title"] = "Home Page";
 }
+@if (signInManager.IsSignedIn(User))
+{
+    <script>
+        window.location.href = "/Categories/Index";
+    </script>
+}
+else
+{
+    <div id="wrapper" class="container-fluid bg-light">
+        <div class="container">
+            <div class="text-center py-5">
+                <h1 class="display-4">Welcome to the Financial Management System!</h1>
+                <p class="lead" style="font-size: 30px !important;">Manage your finances with ease.</p>
+                <a id="login" href="/Account/login" class="btn btn-info btn-lg">Get Started Now</a>
+            </div>
 
-<div class="text-center">
-    <h1 class="display-4">Welcome to the Financial Management System!</h1>
-</div>
+            <div class="container-fluid">
+                <div class="container">
+                    <div class="row py-4 d-flex justify-content-between">
+                        <div id="card equal-height-card" class="card" style="margin-right: 20px; background-color: rgba(255, 255, 255, 0.7) !important;">
+                            <div class="card-body">
+                                <i class="bi bi-currency-dollar display-4"></i>
+                                <h5 class="card-title">Track your spending</h5>
+                                <p class="card-text">Gain visibility into where your money goes.</p>
+                            </div>
+                        </div>
+                        <div id="card equal-height-card" class="card" style="margin-right: 20px; background-color: rgba(255, 255, 255, 0.7) !important;">
+                            <div class="card-body">
+                                <i class="bi bi-piggy-bank-fill display-4"></i>
+                                <h5 class="card-title">Set Smart Savings Goals</h5>
+                                <p class="card-text">Reach your financial targets with personalized savings plans.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+

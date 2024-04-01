@@ -25,6 +25,22 @@ namespace FinancesMVC.Controllers
             return View(await db1Context.ToListAsync());
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Create()
+        {
+            UserProfile userProfile = new() { UserId = IdentityUserId};
+
+            if (ModelState.IsValid)
+            {
+                _context.Add(userProfile);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(userProfile);
+        }
+
         // GET: UserProfiles/Details/5
         public async Task<IActionResult> Details(int? id)
         {

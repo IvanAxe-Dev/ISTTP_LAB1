@@ -16,7 +16,7 @@ namespace FinancesMVC.ViewModels
 
         [Required]
         [Display(Name = "Select the year you were born:")]
-        [Range(1900, 2023)] // Example range, adjust as needed
+        [MinimumAge(8)]
         public int BirthYear { get; set; }
 
         [Required(ErrorMessage = "Please enter a password.")]
@@ -27,8 +27,36 @@ namespace FinancesMVC.ViewModels
 
         [Required(ErrorMessage = "Please confirm the password.")]
         [Display(Name = "Repeat password:")]
-        [Compare("Password", ErrorMessage ="Passwords don't match.")]
+        [Compare("Password", ErrorMessage = "Passwords don't match.")]
         [DataType(DataType.Password)]
         public string ConfirmPassword { get; set; }
+    }
+
+    public class MinimumAgeAttribute : ValidationAttribute
+    {
+        private readonly int _minimumAge;
+
+        public MinimumAgeAttribute(int minimumAge)
+        {
+            _minimumAge = minimumAge;
+            ErrorMessage = "You should be at least " + _minimumAge + " years old to use the app.";
+        }
+
+        public override bool IsValid(object value)
+        {
+            if (value == null)
+            {
+                return false;
+            }
+
+            int birthYear;
+            if (int.TryParse(value.ToString(), out birthYear))
+            {
+                int currentYear = DateTime.Now.Year;
+                return birthYear <= currentYear - _minimumAge;
+            }
+
+            return false;
+        }
     }
 }

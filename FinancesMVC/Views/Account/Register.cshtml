@@ -6,7 +6,7 @@
 
 <div class="row d-flex align-items-center justify-content-center">
     <div style="background-color: rgba(255, 255, 255, 0.7) !important;" class="col-md-4 card p-3">
-        <h2 class="text-center text-info">Register</h2>
+        <h2 class="text-center text-info">Create account</h2>
         <form asp-action="Register" method="post" asp-route-returnurl="@ViewData["ReturnUrl"]">
             <div>
                 <label asp-for="Username" class="control-label"></label><br />
@@ -18,19 +18,19 @@
                 <input asp-for="Email" class="form-control" />
                 <span asp-validation-for="Email" class="text-danger"></span>
             </div>
-            <div>
-                <label asp-for="BirthYear" class="control-label">Birth Year</label><br />
+            <div style ="margin-top:1%;">
+                <label asp-for="BirthYear" class="control-label"></label><br />
                 <select asp-for="BirthYear" asp-items="@ViewBag.YearList" class="form-control"></select>
                 <div class="row">
                     <span asp-validation-for="BirthYear" class="text-danger"></span>
                 </div>
             </div>
-            <div>
+            <div style="margin-top:-1%">
                 <label asp-for="Password" class="control-label"></label><br />
                 <input asp-for="Password" class="form-control" />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
-            <div>
+            <div style="margin-top:3%">
                 <label asp-for="ConfirmPassword" class="control-label"></label><br />
                 <input asp-for="ConfirmPassword" class="form-control" />
                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
@@ -41,9 +41,9 @@
                     <a asp-action="Login" asp-route-returnurl="@ViewData["ReturnUrl"]" class="text-decoration-none float-start mt-2">Have an account?</a>
                 </div>
             </div>
-            <div style="margin-top:5%;" class="row">
+            <div style="margin-top:3%;" class="row">
                 <div class="col-4 offset-3">
-                        <input type="submit" value="Sign up" class="btn btn-primary btn-md float-end" />
+                    <input style="margin-left:50% !important;" type="submit" value="Sign up" class="btn btn-primary btn-md float-end" />
                 </div>
             </div>
         </form>

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.AspNetCore.Identity;
+using System.Diagnostics.Tracing;
 
 namespace FinancesMVC.Models;
 
@@ -68,14 +69,12 @@ public partial class Db1Context : IdentityDbContext<User, IdentityRole<Guid>, Gu
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
                 .HasColumnName("name");
-            entity.Property(e => e.TotalExpences)
-                .HasColumnType("money")
-                .HasColumnName("totalExpences");
             entity.Property(e => e.UserId).HasColumnName("userId");
 
             entity.HasOne(d => d.User).WithMany(p => p.Categories)
                 .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__categorie__userI__4D94879B");
+                .HasConstraintName("FK__categorie__userI__4D94879B")
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Message>(entity =>
@@ -111,7 +110,6 @@ public partial class Db1Context : IdentityDbContext<User, IdentityRole<Guid>, Gu
 
             entity.Property(e => e.AddedUsersId).HasColumnName("addedUserId");
             entity.Property(e => e.CommonCategoryId).HasColumnName("commonCategoryId");
-            entity.Property(e => e.Title).HasColumnName("title");
 
             entity.HasOne(d => d.OwnerUser)
           .WithMany(p => p.SharedBudgets)
@@ -149,7 +147,8 @@ public partial class Db1Context : IdentityDbContext<User, IdentityRole<Guid>, Gu
 
             entity.HasOne(d => d.User).WithMany(p => p.Stats)
                 .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__stats__userId__4CA06362");
+                .HasConstraintName("FK__stats__userId__4CA06362")
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
         modelBuilder.Entity<Transaction>(entity =>
@@ -182,7 +181,8 @@ public partial class Db1Context : IdentityDbContext<User, IdentityRole<Guid>, Gu
 
             entity.HasOne(d => d.ExpenditureCategory).WithMany(p => p.Transactions)
                 .HasForeignKey(d => d.ExpenditureCategoryId)
-                .HasConstraintName("FK__transacti__expen__4BAC3F29");
+                .HasConstraintName("FK__transacti__expen__4BAC3F29")
+                .OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne(d => d.Message).WithMany(p => p.Transactions)
                 .HasForeignKey(d => d.MessageId)
@@ -190,7 +190,8 @@ public partial class Db1Context : IdentityDbContext<User, IdentityRole<Guid>, Gu
 
             entity.HasOne(d => d.User).WithMany(p => p.Transactions)
                 .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK__transacti__userI__48CFD27E");
+                .HasConstraintName("FK__transacti__userI__48CFD27E")
+                .OnDelete(DeleteBehavior.NoAction);
         });
 
         modelBuilder.Entity<User>(entity =>
@@ -246,7 +247,8 @@ public partial class Db1Context : IdentityDbContext<User, IdentityRole<Guid>, Gu
 
             entity.HasOne(d => d.User).WithOne(p => p.UserProfile)
                 .HasForeignKey<UserProfile>(d => d.UserId)
-                .HasConstraintName("FK_UserProfiles_Users");
+                .HasConstraintName("FK_UserProfiles_Users")
+                .OnDelete(DeleteBehavior.SetNull);
         });
 
         OnModelCreatingPartial(modelBuilder);

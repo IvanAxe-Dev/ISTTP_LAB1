@@ -4,6 +4,7 @@ using FinancesMVC.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FinancesMVC.Migrations
 {
     [DbContext(typeof(Db1Context))]
-    partial class Db1ContextModelSnapshot : ModelSnapshot
+    [Migration("20240327173538_TransactionTable_CascadeDeletion")]
+    partial class TransactionTable_CascadeDeletion
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -134,6 +137,10 @@ namespace FinancesMVC.Migrations
 
                     b.Property<Guid>("OwnerId")
                         .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("Title")
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("title");
 
                     b.HasKey("Id")
                         .HasName("PK__shared_b__3213E83F19DEC5E4");
@@ -513,7 +520,6 @@ namespace FinancesMVC.Migrations
                     b.HasOne("FinancesMVC.Models.User", "User")
                         .WithMany("Categories")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .HasConstraintName("FK__categorie__userI__4D94879B");
 
                     b.Navigation("User");
@@ -548,7 +554,6 @@ namespace FinancesMVC.Migrations
                     b.HasOne("FinancesMVC.Models.User", "User")
                         .WithMany("Stats")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
                         .HasConstraintName("FK__stats__userId__4CA06362");
 
                     b.Navigation("ChosenCategory");
@@ -577,7 +582,6 @@ namespace FinancesMVC.Migrations
                     b.HasOne("FinancesMVC.Models.User", "User")
                         .WithMany("Transactions")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
                         .HasConstraintName("FK__transacti__userI__48CFD27E");
 
                     b.Navigation("CompletedAchievement");
@@ -594,7 +598,6 @@ namespace FinancesMVC.Migrations
                     b.HasOne("FinancesMVC.Models.User", "User")
                         .WithOne("UserProfile")
                         .HasForeignKey("FinancesMVC.Models.UserProfile", "UserId")
-                        .OnDelete(DeleteBehavior.SetNull)
                         .HasConstraintName("FK_UserProfiles_Users");
 
                     b.Navigation("User");

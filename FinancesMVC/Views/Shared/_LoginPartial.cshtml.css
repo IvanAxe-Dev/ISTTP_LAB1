@@ -1,0 +1,30 @@
+﻿/* target the navigation link elements on hover */
+.nav-item:hover {
+    /* make the background color slightly darker on hover */
+    background-color: rgba(255, 255, 255, 0.4) !important; /* adjust the transparency as needed */
+    transition: background-color 0.5s ease !important;
+}
+
+/* Style the container and general links */
+.nav-item.dropdown {
+    position: relative; /* Positioning context for the submenu */
+}
+
+.nav-link.dropdown-toggle {
+    cursor: pointer; /* Indicate hoverability */
+}
+
+.dropdown-menu {
+    display: none; /* Initially hidden */
+    position: absolute; /* Positioned relative to parent */
+    top: 105%; /* Place it below the dropdown toggle */
+    right: 0;
+    min-width: 150px; /* Set a minimum width */
+    background-color: #fff;
+    box-shadow: 0px 5px 10px rgba(0, 0, 0, 0.1); /* Add a subtle box shadow */
+}
+
+/* Show the dropdown on hover */
+.nav-item.dropdown:hover .dropdown-menu {
+    display: block; /* Make it visible */
+}

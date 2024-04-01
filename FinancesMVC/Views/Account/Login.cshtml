@@ -24,16 +24,19 @@
                 </label>
             </div>
 
-            <b><div asp-validation-summary="ModelOnly" class="text-danger"></div></b>
+            @if (ViewData.ModelState.ErrorCount > 0)
+            {
+                <b><div asp-validation-summary="ModelOnly" class="text-danger"></div></b>
+            }
 
-            <div class="row">
+            <div class="row" style="margin-top: 4%;">
                 <div class="col-8">
                     <a asp-action="Register" class="text-decoration-none float-start mt-2" asp-route-returnurl="@ViewData["ReturnUrl"]">Don't have an account?</a>
                 </div>
             </div>
-            <div style="margin-top:5%;" class="row">
+            <div style="margin-top:5%; align-content: center !important;" class="row">
                 <div class="col-4 offset-3">
-                    <input type="submit" value="Login" class="btn btn-primary btn-md float-end" />
+                    <input style="margin-left:50% !important;" type="submit" value="Login" class="btn btn-primary btn-md float-end" />
                 </div>
             </div>
 

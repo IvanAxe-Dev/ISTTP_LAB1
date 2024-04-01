@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using System.Text.RegularExpressions;
 
 namespace FinancesMVC.Controllers
 {
@@ -34,7 +35,12 @@ namespace FinancesMVC.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = await _userManager.FindByNameAsync(model.UsernameOrEmail);
+                var emailRegex = @"^([\w-\.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$";
+
+                var user = Regex.IsMatch(model.UsernameOrEmail, emailRegex) ?
+                    await _userManager.FindByEmailAsync(model.UsernameOrEmail) :
+                    await _userManager.FindByNameAsync(model.UsernameOrEmail);
+
                 //login
                 if (user != null)
                 {
@@ -45,7 +51,7 @@ namespace FinancesMVC.Controllers
                     }
                     ModelState.AddModelError("", "Invalid login data.");
                 }
-                
+
                 return View(model);
             }
             return View(model);
@@ -75,12 +81,61 @@ namespace FinancesMVC.Controllers
                     UserName = model.Username,
                     Email = model.Email,
                     BirthYear = model.BirthYear,
-                    IsMature = (DateTime.Now.Year - model.BirthYear) >= 18
+                    IsMature = (DateTime.Now.Year - model.BirthYear) >= 18,
+                    UserProfile = new UserProfile(),
+                    Categories = [
+                        new()
+                        {
+                            Name = "Food",
+                            ExpenditureLimit = 10000,
+                            IsParentControl = false
+                        },
+                        new()
+                        {
+                            Name = "Entertainments",
+                            ExpenditureLimit = 10000,
+                            IsParentControl = false,
+                            Transactions = [new()
+                            {
+                                MoneySpent = 5000,
+                                Date = DateTime.UtcNow,
+                                ExpenditureNote = "For entertainments"
+                            }]
+                        },
+                        new()
+                        {
+                            Name = "Hobbies",
+                            ExpenditureLimit = 10000,
+                            IsParentControl = false,
+                            Transactions = [new()
+                            {
+                                MoneySpent = 7500,
+                                Date = DateTime.UtcNow,
+                                ExpenditureNote = "For hobbies"
+                            }]
+                        },
+                        new()
+                        {
+                            Name = "Clothes",
+                            ExpenditureLimit = 10000,
+                            IsParentControl = false,
+                            Transactions = [new()
+                            {
+                                MoneySpent = 10000,
+                                Date = DateTime.UtcNow,
+                                ExpenditureNote = "For lethermen"
+                            }]
+                        },
+                    ]
                 };
 
                 var result = await _userManager.CreateAsync(user, model.Password!);
 
-                if (result.Succeeded)
+                var roleResult = user.IsMature ? 
+                    await _userManager.AddToRoleAsync(user, "adult") :
+                    await _userManager.AddToRoleAsync(user, "child");
+
+                if (result.Succeeded && roleResult.Succeeded)
                 {
                     await _signInManager.SignInAsync(user, false);
 

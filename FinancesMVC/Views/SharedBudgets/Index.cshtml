@@ -1,60 +1,112 @@
 ﻿@model IEnumerable<FinancesMVC.Models.SharedBudget>
-
+﻿@using Microsoft.AspNetCore.Identity;
+@using System.Security.Claims
+@inject UserManager<User> userManager
+@inject SignInManager<User> signInManager
 
 @{
     ViewData["Title"] = "Index";
     var itemNum = 1;
+    var identityUserId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier));
+
+    Console.WriteLine();
 }
+<div class="table-wrapper">
 
-<h1 style="text-align:center; font-size:50px; margin-bottom:1%;">Shared Categories</h1>
-
-<table class="table">
-    <thead class="table-head">
-        <tr id="head">
-            <th>
-                @Html.DisplayNameFor(model => model.Title)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CommonCategory)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CommonCategoryId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.AddedUsersId)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody class="table-content">
-        @foreach (var item in Model)
+    <h1 style="text-align:center; font-size:50px; margin-bottom:1%;">Shared Categories</h1>
+    @if (Model.Count() == 0)
+    {
+        <p class="text-center py-5 lead" style="font-size: 30px !important;">Share a category with a friend to track common budgets!</p>
+        if (!User.IsInRole("child"))
         {
-            <tr id=@("category" + itemNum) data-id="@item.CommonCategoryId">
-                <td>
-                    <b>@Html.DisplayFor(modelItem => item.Title)</b>
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CommonCategory.Name)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.CommonCategory.TotalExpences) |
-                    <b>@Html.DisplayFor(modelItem => item.CommonCategory.ExpenditureLimit)</b>
-                </td>
-                <td>
-@*                     <b>You, @("@")@Html.DisplayFor(modelItem => item.AddedUser.UserName)</b>
- *@                </td>
-                <td>
-                    <a class="btn btn-info" asp-action="NewTransaction" asp-route-id="@item.CommonCategory.Id">Add new expenditure</a>
-                    <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.Id">Edit category</a>
-                </td>
-            </tr>
+            <div class="text-center p-3 d-flex gap-3 justify-content-center">
+                <a class="btn btn-info btn-lg" asp-action="Create" asp-route-isShared="true" asp-controller="Categories">Add new shared category</a>
+                <a class="btn btn-warning btn-lg" asp-action="Details">Choose existing category</a>
+            </div>
         }
-    </tbody>
-</table>
-<p>
+        else
+        {
+            <i><p class="text-center py-5" style="font-size: 30px !important;">Wait for an adult to share a budget with you...</p></i>
+        }
 
-    <a class="btn btn-primary btn-green" asp-action="Create">Add new shared category</a>
-</p>
+
+    }
+    else
+    {
+        <table class="table">
+            <thead class="table-head">
+                <tr id="head">
+                    <th>
+                        @Html.DisplayNameFor(model => model.CommonCategory)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.CommonCategoryId)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.AddedUsersId)
+                    </th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody class="table-content">
+                @foreach (var item in Model)
+                {
+                    <tr id=@("category" + itemNum) data-id="@item.CommonCategoryId">
+                        <td>
+                            @Html.DisplayFor(modelItem => item.CommonCategory.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.CommonCategory.TotalExpences) |
+                            <b>@Html.DisplayFor(modelItem => item.CommonCategory.ExpenditureLimit)</b>
+                        </td>
+                        <td>
+                            @if (identityUserId == item.OwnerId)
+                            {
+                                <text><b>You</b></text>
+                                @if (item.AddedUsersId != null)
+                                {
+                                    @foreach (var userGuid in item.AddedUsersId.ToList())
+                                    {
+                                        var user = await userManager.FindByIdAsync(userGuid.ToString());
+                                        <text>, @user.UserName</text>
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                <text>You, </text>
+                                <text><b>@item.OwnerUser.UserName</b></text>
+                                @if (item.AddedUsersId != null)
+                                {
+                                    @foreach (var userGuid in item.AddedUsersId.ToList())
+                                    {
+                                        var user = await userManager.FindByIdAsync(userGuid.ToString());
+                                        if (userGuid != identityUserId)
+                                        {
+                                            <text>, @user.UserName</text>
+                                        }
+                                    }
+                                }
+                            }
+
+                        </td>
+                        <td>
+                            <a class="btn btn-info" asp-action="NewTransaction" asp-route-id="@item.CommonCategory.Id">Add new expenditure</a>
+                            @if (identityUserId == item.OwnerId)
+                            {
+                                <a class="btn btn-warning" asp-action="Edit" asp-route-id="@item.Id">Edit category</a>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+        <p>
+            <a class="btn btn-primary" asp-action="Create" asp-route-isShared="true" asp-controller="Categories">Create new shared category</a>
+        </p>
+    }
+</div>
+
 
 <script>
     const tableRows = document.querySelectorAll('table tr');
@@ -73,16 +125,44 @@
 
     window.onload = function () {
 
-        for (let i = 0; i <= colorCodes.length - 1; i++) {
-            const tr = document.getElementById(`category${i + 1}`);
-            if (colorCodes[i] !== null) {
-                tr.style.backgroundColor = colorCodes[i];
-            }
-            console.log(tr.style.backgroundColor);
-        }
+        const colorGradient = [
+            { limit: 0.25, color: '#90EE90' },
+            { limit: 0.5, color: '#FFFF00' },
+            { limit: 0.75, color: '#FFA500' },
+            { limit: 1, color: '#cf3a1b' }
+        ];
+
 
         const tableRows = document.querySelectorAll('table tr');
         const tableCells = document.querySelectorAll('table td');
+
+        tableRows.forEach(row => {
+            if (row.id !== 'head') { // Exclude the table header row
+                const expensesCell = row.querySelectorAll('td')[1];
+                const limitCell = row.querySelectorAll('td')[2];
+
+                const expenses = parseFloat(expensesCell.textContent.replace(/\s/g, ''));
+                const limit = parseFloat(limitCell.textContent.replace(/\s/g, ''));
+                const expenseRatio = limit > 0 ? expenses / limit : 0;
+
+                // Round the expenseRatio to a desired precision (optional)
+                const roundedExpenseRatio = Math.ceil(expenseRatio * 100) / 100;
+
+                if (roundedExpenseRatio >= 1) {
+                    row.style.backgroundColor = colorGradient[3].color;
+                }
+
+                let color;
+                for (const step of colorGradient) {
+                    if (roundedExpenseRatio <= step.limit) {
+                        color = step.color;
+                        break;
+                    }
+                }
+
+                row.style.backgroundColor = color;
+            }
+        });
 
         // Apply opacity to table rows' background color
         tableRows.forEach(row => {

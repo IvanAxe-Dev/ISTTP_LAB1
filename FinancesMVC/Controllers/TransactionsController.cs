@@ -17,7 +17,7 @@ namespace FinancesMVC.Controllers
     {
         private readonly Db1Context _context;
 
-        public TransactionsController(Db1Context context) 
+        public TransactionsController(Db1Context context)
         {
             _context = context;
         }
@@ -56,10 +56,19 @@ namespace FinancesMVC.Controllers
         }
 
         // GET: Transactions/Create
-        public IActionResult Create(int? id, string? name, bool isShared)
+        public IActionResult Create(int? id, bool isShared)
         {
-            ViewBag.CategoryId = id;
-            ViewBag.CategoryName = name;
+            var category = _context.Categories.FirstOrDefault(c => c.Id == id);
+            if (category != null)
+            {
+                ViewBag.CategoryId = id;
+                ViewBag.CategoryName = category.Name;
+                ViewBag.ExpensesLeft =
+                (decimal)category.ExpenditureLimit -
+                _context.Transactions
+                .Where(t => t.ExpenditureCategoryId == id)
+                .Sum(t => t.MoneySpent);
+            }
             ViewData["CompletedAchievementId"] = new SelectList(_context.Achievements, "Id", "Id");
             ViewData["ExpenditureCategoryId"] = new SelectList(_context.Categories, "Id", "Name");
             ViewData["MessageId"] = new SelectList(_context.Messages, "Id", "Id");
@@ -77,14 +86,13 @@ namespace FinancesMVC.Controllers
             transaction.Date = DateTime.Now;
             var category = await _context.Categories.FindAsync(transaction.ExpenditureCategoryId);
             if (category == null) return NotFound();
-            category.TotalExpences += transaction.MoneySpent;
             //check if budget is overflown
             if (category.ExpenditureLimit != null)
             {
                 if ((double)category.TotalExpences > category.ExpenditureLimit)
                 {
                     transaction.BudgetOverflown = true;
-                }   
+                }
             }
 
             _context.Update(category);
@@ -228,7 +236,6 @@ namespace FinancesMVC.Controllers
             var category = await _context.Categories.FindAsync(categoryId);
             if (category != null)
             {
-                category.TotalExpences -= transaction.MoneySpent;
                 _context.Categories.Update(category);
             }
 

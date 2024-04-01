@@ -1,7 +1,10 @@
 ﻿@model FinancesMVC.Models.Category
+﻿@using Microsoft.AspNetCore.Identity;
+@inject UserManager<User> userManager
 
 @{
     ViewData["Title"] = "Edit";
+    var user = await userManager.GetUserAsync(User);
 }
 
 <h1>Edit "@ViewBag.Name"</h1>
@@ -13,7 +16,7 @@
             <input type="hidden" asp-for="Id" />
             <input type="hidden" asp-for="UserId" />
             <input type="hidden" asp-for="TotalExpences" />
-             
+
             <div class="form-group">
                 <label>Category name</label>
                 <input asp-for="Name" class="form-control" />
@@ -24,16 +27,21 @@
                 <input asp-for="ExpenditureLimit" class="form-control" />
                 <span asp-validation-for="ExpenditureLimit" class="text-danger"></span>
             </div>
-            <label class="form-group">
-                Should the category be controlled by a parent?
-                <input asp-for="IsParentControl" type="checkbox" />
-            </label>
-            <input  type="submit" value="Save" class="btn btn-primary" />
+            @if (!user.IsMature)
+            {
+                <label class="form-group">
+                    Should the category be controlled by a parent?
+                    <input asp-for="IsParentControl" type="checkbox" />
+                </label>
+            }
+            <input type="submit" value="Save" class="btn btn-primary" />
         </form>
     </div>
 </div>
 <a class="btn btn-outline-primary" style="margin-top:1%" asp-action="Index">Back to List</a>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

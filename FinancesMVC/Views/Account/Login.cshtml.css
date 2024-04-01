@@ -1,0 +1,19 @@
+﻿.row {
+    margin-top: 12%;
+}
+
+.col-md-3.card { /* Target the container holding your login form */
+    transform: scale(1.3); /* Adjust the scale factor (1.2 makes it 20% larger) */
+}
+
+.row .col-4.offset-3 { /* Target the container of the button */
+    display: flex;
+    justify-content: center !important; /* Center horizontally */
+    align-items: center !important; /* Center vertically (optional) */
+}
+
+.btn.btn-primary {
+    margin: 0 auto  !important;
+    display: block !important;
+    text-align: center !important; /* This line centers the text within the button */
+}

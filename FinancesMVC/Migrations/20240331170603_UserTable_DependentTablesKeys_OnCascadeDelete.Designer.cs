@@ -4,6 +4,7 @@ using FinancesMVC.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FinancesMVC.Migrations
 {
     [DbContext(typeof(Db1Context))]
-    partial class Db1ContextModelSnapshot : ModelSnapshot
+    [Migration("20240331170603_UserTable_DependentTablesKeys_OnCascadeDelete")]
+    partial class UserTable_DependentTablesKeys_OnCascadeDelete
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

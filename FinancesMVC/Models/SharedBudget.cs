@@ -8,9 +8,6 @@ public partial class SharedBudget
 {
     public int Id { get; set; }
 
-    [Display(Name = "Budget")]
-    public string? Title { get; set; }
-
     public Guid OwnerId { get; set; }
 
     [Display(Name = "Members")]

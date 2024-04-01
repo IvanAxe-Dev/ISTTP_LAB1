@@ -1,8 +1,11 @@
 ﻿using FinancesMVC.Models;
+using FinancesMVC.Services;
+using FinancesMVC.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
 namespace FinancesMVC.Controllers
 {
@@ -18,8 +21,9 @@ namespace FinancesMVC.Controllers
         // GET: Categories
         public async Task<IActionResult> Index()
         {
-
-            var db1Context = _context.Categories.Include(c => c.User)
+            var db1Context = _context.Categories
+                .Include(c => c.User)
+                .Include(c => c.Transactions)
                 .Where(c => c.SharedBudgets.Count() == 0)
                 .Where(c => c.UserId == IdentityUserId);
             return View(await db1Context.ToListAsync());
@@ -35,6 +39,7 @@ namespace FinancesMVC.Controllers
 
             var category = await _context.Categories
                 .Include(c => c.User)
+                .Include(c => c.Transactions)
                 .Where(c => c.UserId == IdentityUserId)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
@@ -56,6 +61,7 @@ namespace FinancesMVC.Controllers
 
             var category = await _context.Categories
                 .Include(c => c.User)
+                .Include(c => c.Transactions)
                 .Where(c => c.UserId == IdentityUserId)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
@@ -68,8 +74,18 @@ namespace FinancesMVC.Controllers
         }
 
         // GET: Categories/Create
-        public IActionResult Create()
+        public IActionResult Create(bool isShared)
         {
+            if (isShared)
+            {
+                ViewBag.IsShared = true;
+                ViewData["Users"] = _context.Users
+                    .Where(u => u.Id != IdentityUserId)
+                    .Select(u => u.UserName)
+                    .ToList();
+            }
+            else
+                ViewBag.IsShared = false;
             return View();
         }
 
@@ -78,20 +94,41 @@ namespace FinancesMVC.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,UserId,TotalExpences,ExpenditureLimit,IsParentControl")] Category category)
+        public async Task<IActionResult> Create([Bind("Category, SelectedUsers")] CategoryViewModel generalCategory)
         {
+
             ModelState.Clear();
-            TryValidateModel(category);
+            TryValidateModel(generalCategory.Category);
 
             if (ModelState.IsValid)
             {
-                category.UserId = IdentityUserId;
-                _context.Add(category);
+                generalCategory.Category.UserId = IdentityUserId;
+                _context.Add(generalCategory.Category);
+                if (generalCategory.SelectedUsers != null)
+                {
+                    SharedBudget sharedBudget = new()
+                    {
+                        OwnerId = IdentityUserId,
+                        CommonCategory = generalCategory.Category
+                    };
+                    sharedBudget.AddedUsersId = new List<Guid>();
+                    var serializedArray = generalCategory.SelectedUsers.Count() > 1 ? JsonConvert.DeserializeObject<List<string>>(generalCategory.SelectedUsers[1])
+                        : generalCategory.SelectedUsers;
+                    foreach (var user in serializedArray)
+                    {
+                        User? userInContext = _context.Users.FirstOrDefault(u => u.UserName == user);
+                        if (userInContext != null)
+                        {
+                            sharedBudget.AddedUsersId.Add(userInContext.Id);
+                        }
+                    }
+                    _context.Add(sharedBudget);
+                }
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return generalCategory.SelectedUsers == null ? RedirectToAction(nameof(Index)) : RedirectToAction("Index", "SharedBudgets");
             }
 
-            return View(category);
+            return View(generalCategory);
         }
 
         // GET: Categories/Edit/5
@@ -165,5 +202,26 @@ namespace FinancesMVC.Controllers
         {
             return _context.Categories.Any(e => e.Id == id);
         }
+
+        //  [HttpGet]
+        //  public async Task<IActionResult> Export([FromQuery] string contentType = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        //CancellationToken cancellationToken = default)
+        //  {
+        //      var exportService = _categoryDataPortServiceFactory.GetExportService(contentType);
+
+        //      var memoryStream = new MemoryStream();
+
+        //      await exportService.WriteToAsync(memoryStream, cancellationToken);
+
+        //      await memoryStream.FlushAsync(cancellationToken);
+        //      memoryStream.Position = 0;
+
+
+        //      return new FileStreamResult(memoryStream, contentType)
+        //      {
+        //          FileDownloadName = $"categiries_{DateTime.UtcNow.ToShortDateString()}.xlsx"
+        //      };
+        //  }
+
     }
 }

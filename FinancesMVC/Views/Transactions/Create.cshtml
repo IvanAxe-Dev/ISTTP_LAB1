@@ -12,16 +12,17 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="MoneySpent" class="control-label"></label>
-                <input asp-for="MoneySpent" class="form-control" />
-                <span asp-validation-for="MoneySpent" class="text-danger"></span>
-            </div>
-            <div class="form-group">
                 <label asp-for="ExpenditureNote" class="control-label"></label>
                 <input asp-for="ExpenditureNote" class="form-control" />
                 <span asp-validation-for="ExpenditureNote" class="text-danger"></span>
             </div>
+            <div class="form-group">
+                <label asp-for="MoneySpent" class="control-label"></label>
+                <input id="moneySpentInput" asp-for="MoneySpent" class="form-control" />
+                <span asp-validation-for="MoneySpent" class="text-danger"></span>
+            </div>
             <input type="hidden" asp-for="ExpenditureCategoryId" value="@ViewBag.CategoryId" />
+
             <div class="form-group">
                 <input style="margin-top:5%;" type="submit" value="Create" class="btn btn-primary" />
             </div>
@@ -33,6 +34,22 @@
     <a style="margin-top:1%;" class="btn btn-outline-primary" asp-action="Index">Back to List</a>
 </div>
 
+<script>
+    document.querySelector('.form-group input[type="submit"]').addEventListener('click', function (event) {
+        const moneySpentInput = document.getElementById('moneySpentInput');
+        const moneySpent = parseFloat(moneySpentInput.value);
+
+        if (parseFloat(@ViewBag.ExpensesLeft) <= 0 || moneySpent >= parseFloat(@ViewBag.ExpensesLeft)) {
+            if (!confirm("You have exceeded or reached your budget limit for this category. Do you want to proceed?")) {
+                event.preventDefault(); // Prevent submission if not confirmed
+            }
+        }
+        // else, if the condition is not met, the form submits normally
+    });
+</script>
+
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
