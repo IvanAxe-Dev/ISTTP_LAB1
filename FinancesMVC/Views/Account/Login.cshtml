@@ -30,6 +30,12 @@
             }
 
             <div class="row" style="margin-top: 4%;">
+                @if (ViewData.ModelState.ErrorCount > 0)
+                {
+                    <div class="col-8">
+                        <a asp-action="ForgotPassword" class="text-decoration-none float-start mt-2" asp-route-returnurl="@ViewData["ReturnUrl"]">Forgot password?</a>
+                    </div>
+                }
                 <div class="col-8">
                     <a asp-action="Register" class="text-decoration-none float-start mt-2" asp-route-returnurl="@ViewData["ReturnUrl"]">Don't have an account?</a>
                 </div>

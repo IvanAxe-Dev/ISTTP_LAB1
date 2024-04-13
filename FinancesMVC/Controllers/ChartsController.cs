@@ -12,6 +12,8 @@ namespace FinancesMVC.Controllers
 
         private record CountByDayResponseItem(string Day, string Month, decimal MoneySpent);
 
+        private record CountByCategoryResponseItem(string Category, decimal MoneySpent);
+
         private readonly Db1Context db1Context;
 
         public ChartsController(Db1Context db1Context)
@@ -29,6 +31,19 @@ namespace FinancesMVC.Controllers
                 .GroupBy(transaction => transaction.Date.Date)
                 .Select(group => new CountByDayResponseItem(group.Key.Date.ToString("dd"), 
                 group.Key.Date.ToString("MMMM", culture), group.Sum(t => t.MoneySpent)))
+                .ToListAsync();
+
+            return new JsonResult(responseItems);
+        }
+
+        [HttpGet("spentByCategories")]
+        public async Task<JsonResult> GetSpentByCategoriesAsync()
+        {
+            var responseItems = await db1Context
+                .Transactions
+                .Where(t => t.UserId == IdentityUserId)
+                .GroupBy(transaction => transaction.ExpenditureCategory)
+                .Select(group => new CountByCategoryResponseItem(group.Key.Name, group.Sum(t => t.MoneySpent)))
                 .ToListAsync();
 
             return new JsonResult(responseItems);

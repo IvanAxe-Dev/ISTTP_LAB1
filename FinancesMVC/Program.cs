@@ -4,6 +4,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using FinancesMVC.Controllers;
 using FinancesMVC;
+using DocumentFormat.OpenXml.Office2016.Drawing.ChartDrawing;
+using FinancesMVC.Services;
+using Microsoft.AspNetCore.Identity.UI.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -37,6 +40,7 @@ builder.Services.Configure<IdentityOptions>(options =>
 });
 
 builder.Services.AddScoped<IdentityUserIdFilter>();
+builder.Services.AddTransient<IEmailSender, EmailService>();
 
 var app = builder.Build();
 
